@@ -26,8 +26,12 @@ validate card =
 
 type Peg = String
 type Move = (Peg, Peg)
--- hanoi 2 "a" "b" "c" == [("a","c"),("a","b"),("c","b")]
--- hanoi 3 "a" "b" "c" == [("a","b"),("a","c"),("b","c"),("a","b"),("c","a"),("c","b"),("a","b")]
+-- hanoi 2 "a" "b" "c" 
+-- => [("a","c"),("a","b"),("c","b")]
+-- hanoi 3 "a" "b" "c" 
+-- => [("a","b"),("a","c"),("b","c"),("a","b"),("c","a"),("c","b"),("a","b")]
+-- length $ hanoi 15 "a" "b" "c" 
+-- => 32767
 hanoi :: Integer -> Peg -> Peg -> Peg -> [Move]
 hanoi 1 from to hold = [(from, to)] 
 hanoi n a b c = 
