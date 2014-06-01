@@ -13,3 +13,6 @@ doubleEveryOtherBackwards :: [Integer] -> [Integer]
 doubleEveryOtherBackwards [] = []
 doubleEveryOtherBackwards (h:[]) = [h]
 doubleEveryOtherBackwards (h:(n:ts)) = h : (* 2) n : doubleEveryOtherBackwards ts
+
+sumDigits :: [Integer] -> Integer
+sumDigits = sum . concat . (map toDigits) 
