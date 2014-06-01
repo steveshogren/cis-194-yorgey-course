@@ -16,3 +16,8 @@ doubleEveryOtherBackwards (h:(n:ts)) = h : (* 2) n : doubleEveryOtherBackwards t
 
 sumDigits :: [Integer] -> Integer
 sumDigits = sum . concat . (map toDigits) 
+
+validate :: Integer -> Bool
+validate card = 
+   let sum = (sumDigits . doubleEveryOther . toDigits) card
+   in sum `mod` 10 == 0
