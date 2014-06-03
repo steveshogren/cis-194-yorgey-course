@@ -23,10 +23,15 @@ insert lg Leaf = Node Leaf lg Leaf
 insert lg tree =
    let (LogMessage _ time _) = lg  
        (Node rtree (LogMessage _ ttime _) ltree) = tree
-   in if time > ttime then insert lg ltree else insert lg rtree 
-
-insertRev :: MessageTree -> LogMessage -> MessageTree
-insertRev a b = insert b a
+       (Node _ ilog _) = tree
+   in if time > ttime then Node rtree ilog (insert lg ltree) else Node (insert lg rtree) ilog ltree   
 
 build :: [LogMessage] -> MessageTree
-build = foldl insertRev Leaf  
+build [] = Leaf
+build (h:ts) = (insert h (build ts))
+
+inOrder :: MessageTree -> [LogMessage]
+inOrder Leaf = []
+inOrder (Node rtree lg ltree) =
+  inOrder rtree ++ [lg] ++ inOrder ltree
+
