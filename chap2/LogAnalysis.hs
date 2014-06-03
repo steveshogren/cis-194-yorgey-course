@@ -17,3 +17,10 @@ parseMessageByWord ("W":(time:mes)) = LogMessage Warning (readInt time) (unwords
 parseMessageByWord ("E":(sev: (time:mes))) = LogMessage (Error (readInt sev)) (readInt time) (unwords mes)
 parseMessageByWord mes = Unknown (unwords mes)
 
+insert :: LogMessage -> MessageTree -> MessageTree
+insert (Unknown _) t = t
+insert lg Leaf = Node Leaf lg Leaf  
+insert lg tree =
+   let (LogMessage _ time _) = lg  
+       (Node rtree (LogMessage _ ttime _) ltree) = tree
+   in if time > ttime then insert lg ltree else insert lg rtree 
