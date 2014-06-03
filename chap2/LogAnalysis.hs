@@ -1,15 +1,19 @@
 {-# OPTIONS_GHC -Wall #-}
 module LogAnalysis where
 import Log
-import Data.List.Split
+
+parse :: String -> [LogMessage]
+parse = (map parseMessage) . lines
 
 parseMessage :: String -> LogMessage
-parseMessage = parseMessageByWord . splitOn " "
+parseMessage = parseMessageByWord . words
 
 readInt :: String -> Int
 readInt v = ((read v) :: Int) 
 
 parseMessageByWord :: [String] -> LogMessage
-parseMessageByWord ("E":(sev: (time:mes))) = LogMessage (Error (readInt sev)) (readInt time) (concat mes)
+parseMessageByWord ("I":(time:mes)) = LogMessage Info (readInt time) (unwords mes)
+parseMessageByWord ("W":(time:mes)) = LogMessage Warning (readInt time) (unwords mes)
+parseMessageByWord ("E":(sev: (time:mes))) = LogMessage (Error (readInt sev)) (readInt time) (unwords mes)
+parseMessageByWord mes = Unknown (unwords mes)
 
--- parseMessage "E 2 562 help help" == LogMessage (Error 2) 562 "help help"
