@@ -24,3 +24,9 @@ insert lg tree =
    let (LogMessage _ time _) = lg  
        (Node rtree (LogMessage _ ttime _) ltree) = tree
    in if time > ttime then insert lg ltree else insert lg rtree 
+
+insertRev :: MessageTree -> LogMessage -> MessageTree
+insertRev a b = insert b a
+
+build :: [LogMessage] -> MessageTree
+build = foldl insertRev Leaf  
