@@ -24,7 +24,9 @@ insert lg tree =
    let (LogMessage _ time _) = lg  
        (Node rtree (LogMessage _ ttime _) ltree) = tree
        (Node _ ilog _) = tree
-   in if time > ttime then Node rtree ilog (insert lg ltree) else Node (insert lg rtree) ilog ltree   
+   in if time > ttime then 
+        Node rtree ilog (insert lg ltree) 
+      else Node (insert lg rtree) ilog ltree   
 
 build :: [LogMessage] -> MessageTree
 build [] = Leaf
@@ -35,3 +37,15 @@ inOrder Leaf = []
 inOrder (Node rtree lg ltree) =
   inOrder rtree ++ [lg] ++ inOrder ltree
 
+printLog :: LogMessage -> String
+printLog (LogMessage _ _ msg) = msg
+printLog (Unknown msg)        = msg
+
+whatWentWrong :: [LogMessage] -> [String]
+whatWentWrong = map printLog . inOrder . build . filter isSevere
+
+isSevere :: LogMessage -> Bool
+isSevere (LogMessage (Error sev) _ _) 
+     | sev >= 49 = True
+     | otherwise = False
+isSevere _   = False
