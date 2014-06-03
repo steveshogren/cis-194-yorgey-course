@@ -20,10 +20,8 @@ parseMessageByWord mes = Unknown (unwords mes)
 insert :: LogMessage -> MessageTree -> MessageTree
 insert (Unknown _) t = t
 insert lg Leaf = Node Leaf lg Leaf  
-insert lg tree =
-   let (LogMessage _ time _) = lg  
-       (Node rtree (LogMessage _ ttime _) ltree) = tree
-       (Node _ ilog _) = tree
+insert lg@(LogMessage _ time _) tree =
+   let (Node rtree ilog@(LogMessage _ ttime _) ltree) = tree
    in if time > ttime then 
         Node rtree ilog (insert lg ltree) 
       else Node (insert lg rtree) ilog ltree   
