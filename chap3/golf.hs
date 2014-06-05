@@ -1,3 +1,6 @@
+import Data.List
+import Data.Ord
+
 -- skips "test" 
 -- > ["test","est","st","t"]
 skips :: [a] -> [[a]]
@@ -16,4 +19,13 @@ groupPart :: Int -> [a] -> [[a]]
 groupPart c l = map (\s -> (take c . drop s) l) [0..(length l)-c]
 
 
+histogram :: [Integer] -> String
+histogram i =  
+   let grp = (groupBy (==) . sort) i
+   in (concat . reverse) 
+      ["123456789","=========\n"] 
+ --     ++ map (\s -> ) [1..9]
+
+--getCount :: [[Integer]] -> Integer -> Integer
+--getCount grp n = 
 
