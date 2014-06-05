@@ -1,4 +1,5 @@
 import Data.List
+import Data.Function
 import Data.Ord
 
 -- skips "test" 
@@ -22,10 +23,16 @@ groupPart c l = map (\s -> (take c . drop s) l) [0..(length l)-c]
 histogram :: [Integer] -> String
 histogram i =  
    let grp = (groupBy (==) . sort) i
-   in (concat . reverse) 
+   in (concat . reverse) $
       ["123456789","=========\n"] 
- --     ++ map (\s -> ) [1..9]
+      ++ map (\row -> (map (\s -> if getCount s grp >= row then "*" else "")) [1..9]) [0..getMax grp]
 
---getCount :: [[Integer]] -> Integer -> Integer
---getCount grp n = 
+      -- ++ (concat . map (\s -> show $ getCount s grp)) [1..9]
+getMax :: [[Integer]] -> Int
+getMax = head . head . reverse . sortBy (compare `on` length) 
+
+getCount :: Integer -> [[Integer]] -> Int
+getCount n grp =  
+    let set = filter (\s -> head s == n)  grp
+    in if null set then 0 else (length . head) set
 
