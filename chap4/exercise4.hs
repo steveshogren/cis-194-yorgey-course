@@ -19,11 +19,19 @@ data Tree a = Leaf
             | Node Integer (Tree a) a (Tree a)
      deriving (Show, Eq)
 
-foldTree :: [a] -> Tree a
-foldTree = foldr adder Leaf . sort
+foldTree :: (Ord a) => [a] -> Tree a
+foldTree = foldr adder Leaf . concat . (\(a,b) -> transpose [a,b]) . splitHalf . sort
 
-adder :: a -> Tree a -> Tree a 
-adder a Leaf = Node 0 a Leaf Leaf 
-adder (Node hi left num right) a =  
-   
+adder :: (Ord a) => a -> Tree a -> Tree a 
+adder a Leaf = Node 0 Leaf a Leaf 
+adder a t@(Node hi left num right) = 
+    if a > num then 
+        let nl = adder a left 
+        in Node (1 + hi) nl num right
+    else 
+        let nr = adder a right 
+        in Node (1 + hi) left num nr
+  
+splitHalf :: [a] -> ([a],[a]) 
+splitHalf l = splitAt ((length l + 1) `div` 2) l
 
