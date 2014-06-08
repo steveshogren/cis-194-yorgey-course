@@ -35,3 +35,11 @@ adder a t@(Node hi left num right) =
 splitHalf :: [a] -> ([a],[a]) 
 splitHalf l = splitAt ((length l + 1) `div` 2) l
 
+-- xor [False, True, False] == True
+-- xor [False, True, False, False, True] == False
+xor :: [Bool] -> Bool
+xor = foldr (\s acum -> if s then not acum else acum) False     
+
+-- mapP (+1) [1,2,3,4] == [2,3,4,5]
+mapP :: (a -> b) -> [a] -> [b]
+mapP f = foldr (\s acum -> f s : acum) []
