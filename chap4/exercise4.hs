@@ -43,3 +43,4 @@ xor = foldr (\s acum -> if s then not acum else acum) False
 -- mapP (+1) [1,2,3,4] == [2,3,4,5]
 mapP :: (a -> b) -> [a] -> [b]
 mapP f = foldr (\s acum -> f s : acum) []
+
