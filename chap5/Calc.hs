@@ -51,8 +51,8 @@ newtype Mod7 = Mod7 Integer deriving (Eq, Show)
 
 instance Expr Mod7 where
   lit = Mod7
-  add a b = mod (a+b) 7
-  mul a b = mod (a*b) 7
+  add (Mod7 a) (Mod7 b) = Mod7 $ mod (a+b) 7
+  mul (Mod7 a) (Mod7 b) = Mod7 $ mod (a+b) 7
 
 testExp :: Expr a => Maybe a
 testExp = parseExp lit add mul "(3 * -4) + 5"
