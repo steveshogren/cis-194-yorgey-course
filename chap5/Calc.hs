@@ -61,24 +61,14 @@ instance Expr Mod7 where
 testExp :: Expr a => Maybe a
 testExp = parseExp lit add mul "(3 * -4) + 5"
 
--- data StackExp = PushI Integer
---               | PushB Bool
---               | Add
---               | Mul
---               | And
---               | Or
---                 deriving Show
-
-
 instance Expr Program where
   lit a = [PushI a]
-  add [a] [b] = [a, b, Add]
-  mul [a] [b] = [a, b, Mul]
+  add a b = a ++ b ++ [Add]
+  mul a b = a ++ b ++ [Mul]
 
--- convertProg :: ExprT -> 
+-- compile "(5+6)*3"
+-- Just [PushI 5,PushI 6,Add,PushI 3,Mul]
+compile :: String -> Maybe Program
+compile s = parseExp lit add mul s
 
--- compile :: String -> Maybe Program
--- compile s = 
---   case parseExp Lit Add Mul s of
---     Just x -> Just $ eval x
---     Nothing -> Nothing
+
