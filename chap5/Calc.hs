@@ -1,20 +1,24 @@
-import ExprT
+{-# LANGUAGE TypeSynonymInstances #-}
+{-# LANGUAGE FlexibleInstances #-}
+
+-- import ExprT
+import StackVM
 import Parser
 
 -- eval (Mul (Add (Lit 2) (Lit 3)) (Lit 4)) == 20
-eval :: ExprT -> Integer
-eval (Lit x) = x
-eval (Mul x y) = (eval x) * (eval y)
-eval (Add x y) = (eval x) + (eval y)
+-- eval :: ExprT -> Integer
+-- eval (Lit x) = x
+-- eval (Mul x y) = (eval x) * (eval y)
+-- eval (Add x y) = (eval x) + (eval y)
 
 
 -- evalStr "(2+3)*4" == Just 20
 -- evalStr "(2+3)*" == Nothing
-evalStr :: String -> Maybe Integer
-evalStr s =
-  case parseExp Lit Add Mul s of
-    Just x -> Just $ eval x
-    Nothing -> Nothing
+-- evalStr :: String -> Maybe Integer
+-- evalStr s =
+--   case parseExp Lit Add Mul s of
+--     Just x -> Just $ eval x
+--     Nothing -> Nothing
 
 class Expr a where
   lit :: Integer -> a
@@ -22,13 +26,13 @@ class Expr a where
   mul :: a -> a -> a
 
 
-instance Expr ExprT where
-  lit = Lit
-  add = Add
-  mul = Mul
+-- instance Expr ExprT where
+--   lit = Lit
+--   add = Add
+--   mul = Mul
 
-reify :: ExprT -> ExprT
-reify = id
+-- reify :: ExprT -> ExprT
+-- reify = id
 
 instance Expr Integer where
   lit = id
@@ -57,3 +61,24 @@ instance Expr Mod7 where
 testExp :: Expr a => Maybe a
 testExp = parseExp lit add mul "(3 * -4) + 5"
 
+-- data StackExp = PushI Integer
+--               | PushB Bool
+--               | Add
+--               | Mul
+--               | And
+--               | Or
+--                 deriving Show
+
+
+instance Expr Program where
+  lit a = [PushI a]
+  add [a] [b] = [a, b, Add]
+  mul [a] [b] = [a, b, Mul]
+
+-- convertProg :: ExprT -> 
+
+-- compile :: String -> Maybe Program
+-- compile s = 
+--   case parseExp Lit Add Mul s of
+--     Just x -> Just $ eval x
+--     Nothing -> Nothing
