@@ -20,5 +20,7 @@ instance (Show a) => Show(Stream a) where
 streamToList :: Stream a -> [a]
 streamToList (Cons f r) = f:(streamToList r)
 
+streamRepeat :: a -> Stream a
+streamRepeat a = Cons a $ streamRepeat a
 
 
