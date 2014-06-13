@@ -16,7 +16,7 @@ data Stream a = Cons a (Stream a)
 
 -- this prevents the default "show" from looping infinitely
 instance (Show a) => Show(Stream a) where 
- show (Cons a b) = show a ++ (concat . map show . take 10 . streamToList) b
+ show (Cons a b) = show a ++ "," ++ (concat . map (\s -> show s ++ ",") . take 20 . streamToList) b
 
 streamToList :: Stream a -> [a]
 streamToList (Cons f r) = f:(streamToList r)
@@ -35,3 +35,15 @@ streamFromSeed f s =
   let seed = f s
   in Cons seed $ streamFromSeed f seed
         
+nats :: Stream Integer
+nats = streamFromSeed (+1) 0
+
+
+interleaveStreams :: Stream a -> Stream a -> Stream a
+interleaveStreams (Cons a1 b1) (Cons a2 b2) = Cons a1 $ Cons a2 $ interleaveStreams b1 b2
+
+ruler :: Stream Integer
+ruler = interleaveStreams (streamRepeat 0)
+                          (interleaveStreams (streamRepeat 1) (streamFromSeed (+1) 1))
+
+
