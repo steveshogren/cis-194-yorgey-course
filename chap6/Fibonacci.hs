@@ -23,4 +23,5 @@ streamToList (Cons f r) = f:(streamToList r)
 streamRepeat :: a -> Stream a
 streamRepeat a = Cons a $ streamRepeat a
 
-
+streamMap :: (a -> b) -> Stream a -> Stream b
+streamMap f (Cons a b) = Cons (f a) $ streamMap f b
