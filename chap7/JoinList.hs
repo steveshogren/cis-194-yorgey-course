@@ -13,15 +13,24 @@ tag :: Monoid m => JoinList m a -> m
 tag (Single m _) = m 
 tag (Append m _ _) = m 
 
-t = Single (Sum 1) "a"
+a = Single (Size 1) "a"
+b = Single (Size 1) "b"
+c = Single (Size 1) "c"
+d = Single (Size 1) "d"
 
 --        4
 --    2        2
 -- 1a    1a  1a  1a
 indexJ :: (Sized b, Monoid b) => Int -> JoinList b a -> Maybe a
 indexJ i _ | i < 0 = Nothing
-indexJ _ (Single _ v) = v
+indexJ _ (Single _ v) = Just v
 indexJ i (Append cnt l r) =
-  let mid = ceiling $ size(cnt) / 2
-  in if i < mid then indexJ (abs (i-mid)) l else indexJ (abs (i-mid)) r 
+  let ind = i + 1
+      dub = ind*2
+      count = getSize(size(cnt))
+  in if ind > count
+     then Nothing
+     else if count > dub
+          then indexJ i l
+          else indexJ (i-(dub-count)) r 
 
