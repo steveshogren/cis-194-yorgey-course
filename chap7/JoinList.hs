@@ -18,19 +18,20 @@ b = Single (Size 1) "b"
 c = Single (Size 1) "c"
 d = Single (Size 1) "d"
 
---        4
---    2        2
--- 1a    1a  1a  1a
+-- indexJ 0 $ (a +++ b) +++ (c +++ d) == Just "a"
+-- indexJ 1 $ (a +++ b) +++ (c +++ d) == Just "b"
+-- indexJ 2 $ (a +++ b) +++ (c +++ d) == Just "c"
+-- indexJ 3 $ (a +++ b) +++ (c +++ d) == Just "d"
 indexJ :: (Sized b, Monoid b) => Int -> JoinList b a -> Maybe a
 indexJ i _ | i < 0 = Nothing
 indexJ _ (Single _ v) = Just v
 indexJ i (Append cnt l r) =
-  let ind = i + 1
-      dub = ind*2
+  let -- ind = i + 1
+      dub = i*2
       count = getSize(size(cnt))
-  in if ind > count
+  in if i > (count-1)
      then Nothing
      else if count > dub
           then indexJ i l
-          else indexJ (i-(dub-count)) r 
+          else indexJ (if dub == count then (dub-count) else (i-(dub-count))) r 
 
