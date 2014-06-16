@@ -48,6 +48,12 @@ jlToList Empty = []
 jlToList (Single _ a) = [a]
 jlToList (Append _ l1 l2) = jlToList l1 ++ jlToList l2
 
+
+getCount :: (Sized b, Monoid b) => JoinList b a -> Int
+getCount Empty = 0
+getCount (Single cnt _) =  getSize(size(cnt))
+getCount (Append cnt _ _) =  getSize(size(cnt))
+
 --           6
 --      3         3
 --   1     2    1   2
@@ -56,14 +62,13 @@ dropJ :: (Sized b, Monoid b) => Int -> JoinList b a -> JoinList b a
 dropJ 0 jl = jl 
 dropJ i (Single _ _) | i > 0  = Empty
 dropJ i n@(Append cnt l r) =
-  let dub = i*2
-      count = getSize(size(cnt))
-      inLower = count > dub
-      dropWholeList = i >= count
-      nextIndex = i-(dub-(count*2)) 
-      out = " | i:" ++ show i ++ " count: " ++ show count ++ " dub: " ++ show dub ++ " nextI: " ++ show nextIndex
+  let leftCnt = getCount l 
+      rightCnt = getCount r
+      dropLeft = leftCnt <= i
+      dropWholeList = i >= getCount n
+      out = "" -- " | i:" ++ show i ++ " count: " ++ show(getCount cnt) ++ " leftc: " ++ show leftCnt ++ " rightc: " ++ show rightCnt
   in case () of
     _ | dropWholeList -> trace ("Drop Whole" ++ out) Empty
-      | inLower       -> trace ("Drop to left" ++ out) $ dropJ i l
-      | otherwise     -> trace ("Drop to right" ++ out) $ dropJ nextIndex r
+      | dropLeft      -> trace ("Drop to right" ++ out) $ dropJ (i - leftCnt) r
+      | otherwise     -> trace ("Drop to left" ++ out) $ dropJ i l
 
