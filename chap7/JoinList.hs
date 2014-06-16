@@ -26,8 +26,7 @@ indexJ :: (Sized b, Monoid b) => Int -> JoinList b a -> Maybe a
 indexJ i _ | i < 0 = Nothing
 indexJ _ (Single _ v) = Just v
 indexJ i (Append cnt l r) =
-  let -- ind = i + 1
-      dub = i*2
+  let dub = i*2
       count = getSize(size(cnt))
   in if i > (count-1)
      then Nothing
@@ -47,4 +46,21 @@ jlToList :: JoinList m a -> [a]
 jlToList Empty = []
 jlToList (Single _ a) = [a]
 jlToList (Append _ l1 l2) = jlToList l1 ++ jlToList l2
+
+--           6
+--      3         3
+--   1     2    1   2
+--        1 1      1 1
+dropJ :: (Sized b, Monoid b) => Int -> JoinList b a -> JoinList b a
+dropJ 0 jl = jl 
+dropJ i (Single _ _) | i>0  = Empty
+dropJ i (Append cnt l r) =
+  let dub = i*2
+      count = getSize(size(cnt))
+      inLower = count > dub
+      dropWholeList = i > count
+  in if dropWholeList then Empty
+     else if inLower
+          then dropJ i l
+          else dropJ i r
 
