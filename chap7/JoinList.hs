@@ -35,3 +35,16 @@ indexJ i (Append cnt l r) =
           then indexJ i l
           else indexJ (if dub == count then (dub-count) else (i-(dub-count))) r 
 
+(!!?) :: [a] -> Int -> Maybe a
+[] !!? _ = Nothing
+_ !!? i | i < 0 = Nothing
+(x:xs) !!? 0 = Just x
+(x:xs) !!? i = xs !!? (i-1)
+
+-- (indexJ 0 lister) == (jlToList lister !!? 0) == True
+-- (indexJ 3 lister) == (jlToList lister !!? 3) == True
+jlToList :: JoinList m a -> [a]
+jlToList Empty = []
+jlToList (Single _ a) = [a]
+jlToList (Append _ l1 l2) = jlToList l1 ++ jlToList l2
+
