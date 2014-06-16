@@ -1,5 +1,6 @@
 import Data.Monoid
 import Sized
+import Debug.Trace
 
 data JoinList m a = Empty
                   | Single m a
@@ -53,14 +54,16 @@ jlToList (Append _ l1 l2) = jlToList l1 ++ jlToList l2
 --        1 1      1 1
 dropJ :: (Sized b, Monoid b) => Int -> JoinList b a -> JoinList b a
 dropJ 0 jl = jl 
-dropJ i (Single _ _) | i>0  = Empty
-dropJ i (Append cnt l r) =
+dropJ i (Single _ _) | i > 0  = Empty
+dropJ i n@(Append cnt l r) =
   let dub = i*2
       count = getSize(size(cnt))
       inLower = count > dub
-      dropWholeList = i > count
-  in if dropWholeList then Empty
-     else if inLower
-          then dropJ i l
-          else dropJ i r
+      dropWholeList = i >= count
+      nextIndex = i-(dub-(count*2)) 
+      out = " | i:" ++ show i ++ " count: " ++ show count ++ " dub: " ++ show dub ++ " nextI: " ++ show nextIndex
+  in case () of
+    _ | dropWholeList -> trace ("Drop Whole" ++ out) Empty
+      | inLower       -> trace ("Drop to left" ++ out) $ dropJ i l
+      | otherwise     -> trace ("Drop to right" ++ out) $ dropJ nextIndex r
 
