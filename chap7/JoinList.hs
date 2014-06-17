@@ -55,7 +55,7 @@ getCount Empty = 0
 getCount (Single cnt _) =  getSize(size(cnt))
 getCount (Append cnt _ _) =  getSize(size(cnt))
 
--- foldr (\n ac -> ac && jlToList (dropJ n jl) == drop n (jlToList jl)) True [0..4]
+-- foldr (\n ac -> ac && jlToList (dropJ n jl) == drop n (jlToList jl)) True [0..4] == True
 dropJ :: (Sized b, Monoid b) => Int -> JoinList b a -> JoinList b a
 dropJ 0 jl = jl 
 dropJ i (Single _ _) | i > 0  = Empty
@@ -69,7 +69,22 @@ dropJ i n@(Append cnt l r) =
       | dropWholeLeft  -> dropJ (i - leftCnt) r
       | otherwise      -> 
           let newLeft = dropJ i l
-              newLeftCount = tag newLeft
-              newCount = newLeftCount <> (tag r)
+              newCount = (tag newLeft) <> (tag r)
           in Append newCount newLeft r
 
+-- foldr (\n ac -> ac && jlToList (takeJ n jl) == take n (jlToList jl)) True [0..4] == True
+takeJ :: (Sized b, Monoid b) => Int -> JoinList b a -> JoinList b a
+takeJ 0 _              = Empty
+takeJ _ n@(Single _ _) = n 
+takeJ i n@(Append cnt l r) =
+  let leftCnt = getCount l 
+      rightCnt = getCount r
+      dropWholeRight = leftCnt >= i
+      takeEverything = i >= getCount n
+  in case () of
+    _ | takeEverything -> n
+      | dropWholeRight -> takeJ i l
+      | otherwise      -> -- build new right branch
+          let newRight = takeJ (i - rightCnt) r
+              newCount = (tag newRight) <> (tag l)
+          in Append newCount l newRight
