@@ -11,6 +11,7 @@ gl1 = glCons stan gl
 gl2 = glCons dave gl
 
 x = Node {rootLabel="Test", subForest=[] }
+y = Node {rootLabel="Other", subForest=[x] }
 
 glCons :: Employee -> GuestList -> GuestList
 glCons em (GL emps funs) = GL (em : emps) $ funs + empFun em 
@@ -22,5 +23,8 @@ instance Monoid GuestList where
   mempty  = GL [] 0
   mappend g1@(GL es1 f1) g2@(GL es2 f2) = GL (es1 ++ es2) $ f1 + f2
 
+treeToList :: Tree a -> [a]
+treeToList Node{rootLabel=l,subForest=subs} = l : (concat $ map treeToList subs)
+
 treeFold :: (a -> b -> b) -> b -> Tree a -> b
-treeFold f acum (Node{rootLabel=l,subForest=[]}) = f l acum    
+treeFold f init = (foldr f init) . treeToList
