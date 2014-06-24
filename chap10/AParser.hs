@@ -70,3 +70,15 @@ instance Applicative Parser where
           case f s of
             Nothing -> Nothing
             Just (r, s') -> fmap (first r) . a $ s'
+
+aParser ::  Parser a
+aParser = Parser f
+         where
+           f xs
+             | null ns = Nothing
+             | otherwise = Just(ns, rest)
+             where (ns, rest) = span (=='a') xs
+
+-- abParser :: Parser (Char, Char)
+-- abParser =  <*> 
+                           
