@@ -71,14 +71,6 @@ instance Applicative Parser where
             Nothing -> Nothing
             Just (r, s') -> fmap (first r) . a $ s'
 
-aParser ::  Parser a
-aParser = Parser f
-         where
-           f xs
-             | null ns = Nothing
-             | otherwise = Just(ns, rest)
-             where (ns, rest) = span (=='a') xs
-
--- abParser :: Parser (Char, Char)
--- abParser =  <*> 
+abParser :: Parser (Char, Char)
+abParser = (char 'a') <*> (char 'b')
                            
