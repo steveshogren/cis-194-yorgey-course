@@ -71,6 +71,8 @@ instance Applicative Parser where
             Nothing -> Nothing
             Just (r, s') -> fmap (first r) . a $ s'
 
+-- runParser abParser "abcde" == Just (('a','b'),"cde")
+-- runParser abParser "aabcde" == Nothing
 abParser :: Parser (Char, Char)
-abParser = (char 'a') <*> (char 'b')
+abParser = (,) <$> (char 'a') <*> (char 'b')
                            
