@@ -75,4 +75,12 @@ instance Applicative Parser where
 -- runParser abParser "aabcde" == Nothing
 abParser :: Parser (Char, Char)
 abParser = (,) <$> (char 'a') <*> (char 'b')
+
+cParser_ :: Char -> Parser ()
+cParser_ c = const () <$> char c 
+
+abParser_ :: Parser ()
+abParser_ = cParser_ 'a' <*> cParser_ 'b'
+
+
                            
