@@ -76,11 +76,10 @@ instance Applicative Parser where
 abParser :: Parser (Char, Char)
 abParser = (,) <$> (char 'a') <*> (char 'b')
 
-cParser_ :: Char -> Parser ()
-cParser_ c = const () <$> char c 
-
+-- runParser abParser_ "ab3" == Just ((),"3")
+-- runParser abParser_ "a2b3" == Nothing
 abParser_ :: Parser ()
-abParser_ = cParser_ 'a' <*> cParser_ 'b'
+abParser_ = const () <$> abParser
 
 
                            
