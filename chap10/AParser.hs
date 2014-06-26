@@ -81,5 +81,8 @@ abParser = (,) <$> (char 'a') <*> (char 'b')
 abParser_ :: Parser ()
 abParser_ = const () <$> abParser
 
+intPair :: Parser [Integer]
+intPair = (\i _ i2 -> i : i2 : []) <$> posInt <*> char ' ' <*> posInt
+
 
                            
