@@ -84,5 +84,6 @@ abParser_ = const () <$> abParser
 intPair :: Parser [Integer]
 intPair = (\i _ i2 -> i : i2 : []) <$> posInt <*> char ' ' <*> posInt
 
-
-                           
+instance Alternative Parser where
+  empty = Parser $ \s -> Nothing
+  Parser f <|> Parser g = Parser $ \s -> maybe (g s) Just (f s)
