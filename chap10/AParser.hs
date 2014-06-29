@@ -87,3 +87,12 @@ intPair = (\i _ i2 -> i : i2 : []) <$> posInt <*> char ' ' <*> posInt
 instance Alternative Parser where
   empty = Parser $ \s -> Nothing
   Parser f <|> Parser g = Parser $ \s -> maybe (g s) Just (f s)
+
+upper = satisfy isUpper
+
+-- runParser intOrUppercase "a2" == Nothing
+-- runParser intOrUppercase "a" == Nothing
+-- runParser intOrUppercase "A" == Just ((),"")
+-- runParser intOrUppercase "1A" == Just ((),"A")
+intOrUppercase :: Parser ()
+intOrUppercase = (const () <$> posInt) <|> (const () <$> upper)
