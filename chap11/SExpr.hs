@@ -27,8 +27,10 @@ oneOrMore p = pure (:) <*> p <*> zeroOrMore p
 --  2. Utilities
 ------------------------------------------------------------
 
+-- runParser spaces "34" == Just ("","34")
+-- runParser spaces "   34" == Just ("   ","34")
 spaces :: Parser String
-spaces = undefined
+spaces = zeroOrMore (satisfy isSpace)
 
 ident :: Parser String
 ident = undefined
