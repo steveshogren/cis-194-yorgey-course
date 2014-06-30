@@ -6,16 +6,22 @@ module SExpr where
 
 import AParser
 import Control.Applicative
+import Data.Char
 
 ------------------------------------------------------------
 --  1. Parsing repetitions
 ------------------------------------------------------------
 
+-- runParser (zeroOrMore (satisfy isUpper)) "ABCdEfgH" == Just ("ABC","dEfgH")
+-- runParser (zeroOrMore (satisfy isUpper)) "AcBCdEfgH" == Just ("A","cBCdEfgH")
+-- runParser (zeroOrMore (satisfy isUpper)) "cBCdEfgH" == Just ("","cBCdEfgH")
 zeroOrMore :: Parser a -> Parser [a]
-zeroOrMore p = undefined
+zeroOrMore p = oneOrMore p <|> pure []
 
+-- runParser (oneOrMore (satisfy isUpper)) "cBCdEfgH" == Nothing
+-- runParser (oneOrMore (satisfy isUpper)) "ABcBCdEfgH" == Just ("AB","cBCdEfgH")
 oneOrMore :: Parser a -> Parser [a]
-oneOrMore p = undefined
+oneOrMore p = pure (:) <*> p <*> zeroOrMore p 
 
 ------------------------------------------------------------
 --  2. Utilities
