@@ -21,7 +21,7 @@ zeroOrMore p = oneOrMore p <|> pure []
 -- runParser (oneOrMore (satisfy isUpper)) "cBCdEfgH" == Nothing
 -- runParser (oneOrMore (satisfy isUpper)) "ABcBCdEfgH" == Just ("AB","cBCdEfgH")
 oneOrMore :: Parser a -> Parser [a]
-oneOrMore p = pure (:) <*> p <*> zeroOrMore p 
+oneOrMore p = (:) <$> p <*> zeroOrMore p 
 
 ------------------------------------------------------------
 --  2. Utilities
@@ -32,8 +32,12 @@ oneOrMore p = pure (:) <*> p <*> zeroOrMore p
 spaces :: Parser String
 spaces = zeroOrMore (satisfy isSpace)
 
+-- runParser ident "foobar baz" == Just ("foobar"," baz")
+-- runParser ident "foob33c" == Just ("foob33c","")
+-- runParser ident "" == Nothing
+-- runParser ident " adf" ==  Nothing
 ident :: Parser String
-ident = undefined
+ident = (++) <$> oneOrMore(satisfy isAlpha) <*> (zeroOrMore $ satisfy isAlphaNum)
 
 ------------------------------------------------------------
 --  3. Parsing S-expressions
