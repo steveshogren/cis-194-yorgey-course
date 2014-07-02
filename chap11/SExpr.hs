@@ -57,5 +57,8 @@ data SExpr = A Atom
            | Comb [SExpr]
   deriving Show
 
+parseAtom :: Parser Atom
+parseAtom = (I <$> ident) <|> (N <$> posInt)
+
 parseSExpr :: Parser SExpr
-parseSExpr = (A . I) <$> (char '(' *> ident <* char ')')
+parseSExpr = A <$> (char '(' *> parseAtom <* char ')')
