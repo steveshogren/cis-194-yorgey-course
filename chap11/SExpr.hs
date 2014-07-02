@@ -61,4 +61,7 @@ parseAtom :: Parser Atom
 parseAtom =  spaces *> ((I <$> ident) <|> (N <$> posInt)) <* spaces
 
 parseSExpr :: Parser SExpr
-parseSExpr = A <$> (char '(' *> parseAtom <* char ')')
+parseSExpr = (A <$> (char '(' *> parseAtom <* char ')'))
+               <|> (Comb <$> (char '(' *> oneOrMore(parseSExpr) <* char ')'))
+
+
