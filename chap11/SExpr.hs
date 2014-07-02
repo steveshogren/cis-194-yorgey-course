@@ -58,7 +58,7 @@ data SExpr = A Atom
   deriving Show
 
 parseAtom :: Parser Atom
-parseAtom = (I <$> ident) <|> (N <$> posInt)
+parseAtom =  spaces *> ((I <$> ident) <|> (N <$> posInt)) <* spaces
 
 parseSExpr :: Parser SExpr
 parseSExpr = A <$> (char '(' *> parseAtom <* char ')')
