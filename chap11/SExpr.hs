@@ -60,8 +60,16 @@ data SExpr = A Atom
 parseAtom :: Parser Atom
 parseAtom =  spaces *> ((I <$> ident) <|> (N <$> posInt)) <* spaces
 
+eatOpenParen :: Parser ()
+eatOpenParen  = const () <$> char '(' <* spaces
+
+eatCloseParen :: Parser ()
+eatCloseParen  = const () <$> spaces <* char ')'
+
 parseSExpr :: Parser SExpr
-parseSExpr = (A <$> (char '(' *> parseAtom <* char ')'))
-               <|> (Comb <$> (char '(' *> oneOrMore(parseSExpr) <* char ')'))
+parseSExpr = eatOpenParen *>
+             ((A <$> parseAtom) <|> (Comb <$> oneOrMore(parseSExpr)))
+             <* eatCloseParen
+
 
 
