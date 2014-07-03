@@ -67,9 +67,6 @@ eatCloseParen :: Parser ()
 eatCloseParen  = const () <$> spaces <* char ')'
 
 parseSExpr :: Parser SExpr
-parseSExpr = eatOpenParen *>
-             ((A <$> parseAtom) <|> (Comb <$> oneOrMore(parseSExpr)))
-             <* eatCloseParen
-
-
-
+parseSExpr =
+  (A <$> parseAtom)
+  <|> (eatOpenParen *> (Comb <$> oneOrMore(parseSExpr)) <* eatCloseParen)
