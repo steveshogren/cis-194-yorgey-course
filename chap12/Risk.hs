@@ -26,3 +26,10 @@ die = getRandom
 type Army = Int
 
 data Battlefield = Battlefield { attackers :: Army, defenders :: Army }
+
+-- battle :: Battlefield -> Rand StdGen Battlefield
+
+roller = do
+  v <- evalRandIO die
+  let t = unDV v
+    in putStrLn ("Roll: " ++ show t )
