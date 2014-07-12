@@ -28,11 +28,35 @@ type Army = Int
 data Battlefield = Battlefield { attackers :: Army, defenders :: Army }
   deriving (Eq, Ord, Show)
 
+attackRollCount 0          = Nothing
+attackRollCount a | a <= 3 = Just a
+attackRollCount _          = Just 3
+
+defendRollCount 0          = Nothing
+defendRollCount d | d <= 2 = Just d
+defendRollCount d          = Just 2
+
+data Winner = Attacker | Defender
+  deriving (Eq, Ord, Show)
+
+fight1on1 ar dr = if ar <= dr
+                  then Defender
+                  else Attacker
+
 -- battle :: Battlefield -> Rand StdGen Battlefield
 -- battle b =
 --   let a = attackers b
 --       d = defenders b
--- in  
+--   in if a > 1 && b > 0  
+
+oneFight = do
+  a <- roll
+  d <- roll
+  let ad = unDV a
+      dd = unDV d
+      res =  fight1on1 ad dd
+  putStrLn ("res: " ++ show(res) ++ " ar: " ++ show(ad) ++ " dr: " ++ show(dd))
+  
 
 roll = (evalRandIO die)
 printBattle b = putStrLn("Results: " ++ show(b))
