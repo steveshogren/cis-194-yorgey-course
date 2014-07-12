@@ -26,12 +26,22 @@ die = getRandom
 type Army = Int
 
 data Battlefield = Battlefield { attackers :: Army, defenders :: Army }
+  deriving (Eq, Ord, Show)
 
 -- battle :: Battlefield -> Rand StdGen Battlefield
 -- battle b =
 --   let a = attackers b
 --       d = defenders b
 -- in  
+
+roll = (evalRandIO die)
+printBattle b = putStrLn("Results: " ++ show(b))
+
+roller4 = 
+  fmap (\n ->
+         let i = unDV n
+         in Battlefield {attackers=i, defenders=i}) roll 
+  >>= printBattle
 
 roller3 = 
   fmap (+10) (evalRandIO die)
