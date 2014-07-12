@@ -28,8 +28,19 @@ type Army = Int
 data Battlefield = Battlefield { attackers :: Army, defenders :: Army }
 
 -- battle :: Battlefield -> Rand StdGen Battlefield
+-- battle b =
+--   let a = attackers b
+--       d = defenders b
+-- in  
+
+roller2 = 
+  evalRandIO die
+  >>= (\s -> putStrLn("Roll: " ++ show(unDV(s))))
+      -- in d >>= (\t -> unDV(t) + 1) >>= (\t ->putStrLn ("Test" ++ show t))
 
 roller = do
   v <- evalRandIO die
   let t = unDV v
     in putStrLn ("Roll: " ++ show t )
+
+  
