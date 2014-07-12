@@ -33,10 +33,13 @@ data Battlefield = Battlefield { attackers :: Army, defenders :: Army }
 --       d = defenders b
 -- in  
 
+roller3 = 
+  fmap (+10) (evalRandIO die)
+  >>= (\s -> putStrLn("Roll: " ++ show(unDV(s))))
+
 roller2 = 
   evalRandIO die
-  >>= (\s -> putStrLn("Roll: " ++ show(unDV(s))))
-      -- in d >>= (\t -> unDV(t) + 1) >>= (\t ->putStrLn ("Test" ++ show t))
+  >>= (\s -> putStrLn("Roll: " ++ show(10+unDV(s))))
 
 roller = do
   v <- evalRandIO die
