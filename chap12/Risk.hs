@@ -3,6 +3,7 @@
 module Risk where
 
 import Control.Monad.Random
+import Control.Applicative
 
 ------------------------------------------------------------
 -- Die values
@@ -39,24 +40,24 @@ defendRollCount d          = Just 2
 data Winner = Attacker | Defender
   deriving (Eq, Ord, Show)
 
-fight1on1 ar dr = if ar <= dr
-                  then Defender
-                  else Attacker
+fight1on1 (ar, dr) = if unDV(ar) <= unDV(dr)
+                     then Defender
+                     else Attacker
 
+getRollCounts a d = (,) <$> attackRollCount(a) <*> defendRollCount(d)
+
+oneFight battlefield = 
+  let a = roll
+      d = roll
+      rolls = (,) <$> a <*> d
+      res = fmap fight1on1(rolls)
+  in res
+  
 -- battle :: Battlefield -> Rand StdGen Battlefield
 -- battle b =
 --   let a = attackers b
 --       d = defenders b
 --   in if a > 1 && b > 0  
-
-oneFight = do
-  a <- roll
-  d <- roll
-  let ad = unDV a
-      dd = unDV d
-      res =  fight1on1 ad dd
-  putStrLn ("res: " ++ show(res) ++ " ar: " ++ show(ad) ++ " dr: " ++ show(dd))
-  
 
 roll = (evalRandIO die)
 printBattle b = putStrLn("Results: " ++ show(b))
