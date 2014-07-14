@@ -4,6 +4,7 @@ module Risk where
 
 import Control.Monad.Random
 import Control.Applicative
+import Data.List
 
 ------------------------------------------------------------
 -- Die values
@@ -29,13 +30,13 @@ type Army = Int
 data Battlefield = Battlefield { attackers :: Army, defenders :: Army }
   deriving (Eq, Ord, Show)
 
-attackRollCount 0          = Nothing
-attackRollCount a | a <= 3 = Just a
-attackRollCount _          = Just 3
+attackRollCount 0          = 0
+attackRollCount a | a <= 3 = a
+attackRollCount _          = 3
 
-defendRollCount 0          = Nothing
-defendRollCount d | d <= 2 = Just d
-defendRollCount d          = Just 2
+defendRollCount 0          = 0
+defendRollCount d | d <= 2 = d
+defendRollCount d          = 2
 
 data Winner = Attacker | Defender
   deriving (Eq, Ord, Show)
@@ -46,13 +47,27 @@ fight1on1 (ar, dr) = if unDV(ar) <= unDV(dr)
 
 getRollCounts a d = (,) <$> attackRollCount(a) <*> defendRollCount(d)
 
-oneFight battlefield = 
-  let a = roll
-      d = roll
-      rolls = (,) <$> a <*> d
-      res = fmap fight1on1(rolls)
-  in res
-  
+-- oneFight battlefield = 
+--   let a = attackers battlefield
+--       d = defenders battlefield
+--       attackRolls = sort $ rolls(attackRollCount a)
+--       defendRolls = sort $ rolls(defendRollCount d)
+--   in attackRolls
+
+rolls :: Army -> Rand StdGen [DieValue]
+rolls 0 = return []
+rolls count = do
+  hroll <- die
+  trolls <- rolls (count - 1)
+  return (hroll : trolls)
+
+-- oneFight battlefield = 
+--   let a = attackers battlefield
+--       d = defenders battlefield
+--       attackRolls = sort $ rolls(attackRollCount a)
+--       defendRolls = sort $ rolls(defendRollCount d)
+--   in attackRolls
+
 -- battle :: Battlefield -> Rand StdGen Battlefield
 -- battle b =
 --   let a = attackers b
