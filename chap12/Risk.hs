@@ -2,6 +2,7 @@
 
 module Risk where
 
+import Control.Monad
 import Control.Monad.Random
 import Control.Applicative
 import Data.List
@@ -30,29 +31,22 @@ type Army = Int
 data Battlefield = Battlefield { attackers :: Army, defenders :: Army }
   deriving (Eq, Ord, Show)
 
-attackRollCount 0          = 0
-attackRollCount a | a <= 3 = a
-attackRollCount _          = 3
+attackRollCount = min 3
+defendRollCount = min 2
 
-defendRollCount 0          = 0
-defendRollCount d | d <= 2 = d
-defendRollCount d          = 2
+b = Battlefield {attackers=4, defenders=4}
 
-data Winner = Attacker | Defender
-  deriving (Eq, Ord, Show)
+getKills [] = (0,0) 
+getKills ((at1,def1):res) = 
+  let (atSum, defSum) = getKills res
+-- never need to extract unDV... it is Ord
+  in if def1 >= at1 then (atSum+1,defSum) else (atSum, defSum+1)
 
-fight1on1 (ar, dr) = if unDV(ar) <= unDV(dr)
-                     then Defender
-                     else Attacker
-
-getRollCounts a d = (,) <$> attackRollCount(a) <*> defendRollCount(d)
-
--- oneFight battlefield = 
---   let a = attackers battlefield
---       d = defenders battlefield
---       attackRolls = sort $ rolls(attackRollCount a)
---       defendRolls = sort $ rolls(defendRollCount d)
---   in attackRolls
+oneFight Battlefield {attackers=att, defenders=def} = do
+  attackRolls <- sortRolls $ rolls(attackRollCount att)
+  defendRolls <- sortRolls $ rolls(defendRollCount def)
+  let (atkLosses, defLosses) = getKills $ zip attackRolls defendRolls
+  return Battlefield {attackers=att-atkLosses, defenders=def-defLosses}
 
 rolls :: Army -> Rand StdGen [DieValue]
 rolls 0 = return []
@@ -61,12 +55,8 @@ rolls count = do
   trolls <- rolls (count - 1)
   return (hroll : trolls)
 
--- oneFight battlefield = 
---   let a = attackers battlefield
---       d = defenders battlefield
---       attackRolls = sort $ rolls(attackRollCount a)
---       defendRolls = sort $ rolls(defendRollCount d)
---   in attackRolls
+sortRolls :: Rand StdGen [DieValue] -> Rand StdGen [DieValue] 
+sortRolls = liftM $ sortBy (flip compare)  
 
 -- battle :: Battlefield -> Rand StdGen Battlefield
 -- battle b =
