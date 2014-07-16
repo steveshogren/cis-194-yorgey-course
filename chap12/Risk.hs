@@ -42,11 +42,17 @@ getKills ((at1,def1):res) =
 -- never need to extract unDV... it is Ord
   in if def1 >= at1 then (atSum+1,defSum) else (atSum, defSum+1)
 
+oneFight :: Battlefield -> Rand StdGen Battlefield 
 oneFight Battlefield {attackers=att, defenders=def} = do
   attackRolls <- sortRolls $ rolls(attackRollCount att)
   defendRolls <- sortRolls $ rolls(defendRollCount def)
   let (atkLosses, defLosses) = getKills $ zip attackRolls defendRolls
   return Battlefield {attackers=att-atkLosses, defenders=def-defLosses}
+
+showFight :: IO() 
+showFight = 
+  (evalRandIO $ oneFight b)
+  >>= printBattle
 
 rolls :: Army -> Rand StdGen [DieValue]
 rolls 0 = return []
@@ -58,13 +64,13 @@ rolls count = do
 sortRolls :: Rand StdGen [DieValue] -> Rand StdGen [DieValue] 
 sortRolls = liftM $ sortBy (flip compare)  
 
--- battle :: Battlefield -> Rand StdGen Battlefield
--- battle b =
---   let a = attackers b
---       d = defenders b
---   in if a > 1 && b > 0  
+battle :: Battlefield -> Rand StdGen Battlefield
+battle = oneFight
 
+roll :: IO DieValue
 roll = (evalRandIO die)
+
+printBattle :: Show a => a -> IO ()
 printBattle b = putStrLn("Results: " ++ show(b))
 
 roller4 = 
