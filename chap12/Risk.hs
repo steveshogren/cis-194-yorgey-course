@@ -35,12 +35,23 @@ attackRollCount = min 3
 defendRollCount = min 2
 
 b = Battlefield {attackers=4, defenders=4}
+b1 = Battlefield {attackers=5, defenders=4}
+b2 = Battlefield {attackers=2, defenders=4}
 
 getKills [] = (0,0) 
 getKills ((at1,def1):res) = 
   let (atSum, defSum) = getKills res
 -- never need to extract unDV... it is Ord
   in if def1 >= at1 then (atSum+1,defSum) else (atSum, defSum+1)
+
+winNum :: Rand StdGen Battlefield -> Rand StdGen Double 
+winNum = fmap (\Battlefield {attackers=att, defenders=def} -> if def == 0 then 1 else 0) 
+
+makeWinList :: Int -> Battlefield -> [Rand StdGen Double]
+makeWinList count b = map (\_ -> winNum $ invade b) [1..count]
+
+successProb :: Battlefield -> Rand StdGen Double
+successProb b = fmap (\s -> s/1000) $ liftM (foldl (+) 0) $ sequence $ makeWinList 1000 b
 
 invade :: Battlefield -> Rand StdGen Battlefield
 invade b@(Battlefield {attackers=att, defenders=def}) = 
