@@ -37,6 +37,7 @@ defendRollCount = min 2
 b = Battlefield {attackers=4, defenders=4}
 b1 = Battlefield {attackers=5, defenders=4}
 b2 = Battlefield {attackers=2, defenders=4}
+b3 = Battlefield {attackers=12, defenders=4}
 
 getKills [] = (0,0) 
 getKills ((at1,def1):res) = 
