@@ -40,3 +40,4 @@ makeCon input =
   snd . foldl (\(cnt, conc) -> \sent ->
                 ((cnt+1), addSentenceToConc sent cnt conc)) newConc $ sentences input 
 
+

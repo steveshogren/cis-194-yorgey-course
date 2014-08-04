@@ -10,9 +10,11 @@ codeDirectory = "/home/jack/programing"
 
 searchPath = codeDirectory ++ "/**/.git"
 
+
 main = do
-  all <- getDirectoryContents "/home/jack/programming"
-  let filtered = filter (isPrefixOf "sicp") all
+--  all <- getDirectoryContents "/home/jack/programming"
+  all <- getDirectoryContents "/home/jack/programming/sicp"
+  let filtered = filter (isPrefixOf ".git") all
   print filtered
 
 
