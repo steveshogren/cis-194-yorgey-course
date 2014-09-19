@@ -11,8 +11,12 @@ parseSuit 'D' = Diamonds
 parseSuit 'C' = Clubs
 parseSuit 'S' = Spades
 
+-- parse "H2"
 parse str = Card (parseSuit $ head str) (read $ tail str) 
 
--- parse "H2"
+parseHand = map parse . words 
+h1 = parseHand "H2 D2 H5 D8 C9"
+
+
 
 
