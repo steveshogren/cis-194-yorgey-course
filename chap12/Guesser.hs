@@ -5,7 +5,8 @@ data Suit = Clubs | Spades | Hearts | Diamonds
 
 type FaceValue = Int
 
-data Card = Card FaceValue Suit 
+
+data Card = Card { fv :: FaceValue, s :: Suit } 
   deriving (Eq, Show, Ord)
 
 parseSuit 'H' = Hearts
@@ -20,8 +21,10 @@ parseHand = map parse . words
 
 h1 = parseHand "H6 H2 D2 D8 C9"
 
-identify = groupBy (\fv s -> fv) . sort 
+-- identify = groupBy (\c1 c2 -> (==) (fv c1) (fv c2) ) . sort 
+identify = groupBy (\c1 c2 -> (== fv c1) $ fv c2 ) . sort 
 
+g1 = identify h1
 
 
 
