@@ -25,14 +25,17 @@ parseHand = map parse . words
 grouped = groupBy (\c1 c2 -> (==) (fv c1) (fv c2) ) . sort 
 
 ofAKind num h = filter (\x -> length x > (num - 1)) $ grouped h
-
+-- ofAKind 2 h1
 identify x =
-  if length (ofAKind 4 x) > 0 then
-    FourKind 1
-  else if length (ofAKind 3 x) > 0 then
-    ThreeKind 1
-  else if length (ofAKind 2 x) > 0 then
-    TwoKind 1
+  let t4 = ofAKind 4 x
+      t3 = ofAKind 3 x
+      t2 = ofAKind 2 x
+  in if length t4 > 0 then
+    FourKind (fv $ head $ head t4)
+  else if length t3 > 0 then
+    ThreeKind (fv $ head $ head t3)
+  else if length t2 > 0 then
+    TwoKind (fv $ head $ head t2)
   else HighCard
   
 h1 = parseHand "H6 H2 D2 D8 C9"
