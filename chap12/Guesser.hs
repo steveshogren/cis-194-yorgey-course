@@ -39,5 +39,11 @@ h1 = parseHand "H6 H2 D2 D8 C9"
 h2 = parseHand "H2 H2 D2 D8 C9"
 h3 = parseHand "H2 H2 D2 D2 C9"
 
-
+rt = 
+    let i1 = identify h1
+        i2 = identify h2
+        i3 = identify h3
+    in i1 == TwoKind 2 &&
+       i2 == ThreeKind 2 &&
+       i3 == FourKind 2
 
