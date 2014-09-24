@@ -1,5 +1,8 @@
 import Data.List 
 
+empty = (==0) . length
+isSeq = not . empty
+
 data Suit = Clubs | Spades | Hearts | Diamonds
   deriving (Eq, Ord, Show)
 
@@ -11,6 +14,7 @@ data Hand = TwoKind FaceValue
           | HighCard
           | Flush Suit
           | Straight FaceValue
+          | FullHouse FaceValue FaceValue
   deriving (Eq, Ord, Show)
 
 data Card = Card { fv :: FaceValue, s :: Suit } 
@@ -31,11 +35,14 @@ groupFn f = groupBy (\c1 c2 -> (==) (f c1) (f c2))
 grouped = groupFn fv . sort 
 
 -- ofAKind 2 h1
-ofAKind num h = filter (\x -> length x > (num - 1)) $ grouped h
+ofAKind num h =
+  let kindGroup = filter (\x -> length x == num) $ grouped h
+  in (isSeq kindGroup, (fv . head . head) kindGroup)
+
 
 flush x =
   let g = groupFn s x
-  in (length (head g) == 5, g)
+  in (length (head g) == 5, (s . head . head) g)
 
 faces = map fv . sort
 
@@ -45,35 +52,38 @@ straight cs =
       expected = [start..start+4]
   in (expected==fs, (head . reverse) fs)
 
-
 identify x =
-  let t4 = ofAKind 4 x
-      t3 = ofAKind 3 x
-      t2 = ofAKind 2 x
+  let (is4K, t4) = ofAKind 4 x
+      (is3K, t3) = ofAKind 3 x
+      (is2K, t2) = ofAKind 2 x
       (isFlush, f1) = flush x
       (isStraight, s1) = straight x
   in if isFlush then
-       Flush $ s . head . head $ f1
-     else if length t4 > 0 then
-            FourKind (fv $ head $ head t4)
+       Flush f1
+     else if is4K then
+            FourKind t4
           else if isStraight then
                  Straight s1
-               else if length t3 > 0 then
-                      ThreeKind (fv $ head $ head t3)
-                    else if length t2 > 0 then
-                           TwoKind (fv $ head $ head t2)
-                         else HighCard
+               else if is3K && is2K then
+                      FullHouse t3 t2 
+                    else if is3K then
+                           ThreeKind t3
+                         else if is2K then
+                                TwoKind t2
+                              else HighCard
   
-h1 = parseHand "H6 H2 D2 D8 C9"
-h2 = parseHand "H2 H2 D2 D8 C9"
-h3 = parseHand "H2 H2 D2 D2 C9"
-h4 = parseHand "H2 H5 H7 H10 H9"
-h5 = parseHand "H6 S3 H4 D5 H2"
+k2 = parseHand "H6 H2 D2 D8 C9"
+k3 = parseHand "H2 H2 D2 D8 C9"
+k4 = parseHand "H2 H2 D2 D2 C9"
+fl = parseHand "H2 H5 H7 H10 H9"
+st = parseHand "H6 S3 H4 D5 H2"
+fh = parseHand "H2 H2 D2 D9 C9"
 
 rt = 
-    identify h1 == TwoKind 2 &&
-    identify h2 == ThreeKind 2 &&
-    identify h3 == FourKind 2 &&
-    identify h4 == Flush Hearts &&
-    identify h5 == Straight 6
+    identify k2 == TwoKind 2 &&
+    identify k3 == ThreeKind 2 &&
+    identify k4 == FourKind 2 &&
+    identify fl == Flush Hearts &&
+    identify fh == FullHouse 2 9 && -- three 2s higher
+    identify st == Straight 6 
 
