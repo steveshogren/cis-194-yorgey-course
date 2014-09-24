@@ -10,6 +10,7 @@ data Hand = TwoKind FaceValue
           | FourKind FaceValue
           | HighCard
           | Flush Suit
+          | Straight FaceValue
   deriving (Eq, Ord, Show)
 
 data Card = Card { fv :: FaceValue, s :: Suit } 
@@ -36,29 +37,43 @@ flush x =
   let g = groupFn s x
   in (length (head g) == 5, g)
 
+faces = map fv . sort
+
+straight cs =
+  let fs = faces cs
+      start = head fs
+      expected = [start..start+4]
+  in (expected==fs, (head . reverse) fs)
+
+
 identify x =
   let t4 = ofAKind 4 x
       t3 = ofAKind 3 x
       t2 = ofAKind 2 x
       (isFlush, f1) = flush x
+      (isStraight, s1) = straight x
   in if isFlush then
        Flush $ s . head . head $ f1
      else if length t4 > 0 then
             FourKind (fv $ head $ head t4)
-          else if length t3 > 0 then
-                 ThreeKind (fv $ head $ head t3)
-               else if length t2 > 0 then
-                      TwoKind (fv $ head $ head t2)
-                    else HighCard
+          else if isStraight then
+                 Straight s1
+               else if length t3 > 0 then
+                      ThreeKind (fv $ head $ head t3)
+                    else if length t2 > 0 then
+                           TwoKind (fv $ head $ head t2)
+                         else HighCard
   
 h1 = parseHand "H6 H2 D2 D8 C9"
 h2 = parseHand "H2 H2 D2 D8 C9"
 h3 = parseHand "H2 H2 D2 D2 C9"
 h4 = parseHand "H2 H5 H7 H10 H9"
+h5 = parseHand "H6 S3 H4 D5 H2"
 
 rt = 
     identify h1 == TwoKind 2 &&
     identify h2 == ThreeKind 2 &&
     identify h3 == FourKind 2 &&
-    identify h4 == Flush Hearts
+    identify h4 == Flush Hearts &&
+    identify h5 == Straight 6
 
