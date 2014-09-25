@@ -30,7 +30,7 @@ parse str = Card  (read $ tail str)  (parseSuit $ head str)
 
 parseHand = map parse . words 
 
-groupFn f = groupBy (\c1 c2 -> (==) (f c1) (f c2))  
+groupFn f = groupBy (\c1 c2 -> (==) (f c1) (f c2)) 
 
 grouped = groupFn fv . sort 
 
@@ -71,6 +71,8 @@ identify x =
                          else if is2K then
                                 TwoKind t2
                               else HighCard
+
+winner = head . sort
   
 k2 = parseHand "H6 H2 D2 D8 C9"
 k3 = parseHand "H2 H2 D2 D8 C9"
@@ -85,5 +87,8 @@ rt =
     identify k4 == FourKind 2 &&
     identify fl == Flush Hearts &&
     identify fh == FullHouse 2 9 && -- three 2s higher
-    identify st == Straight 6 
+    identify st == Straight 6 &&
+    winner [k3, k2] == k3 &&
+    winner [k3, fl, k2] == fl
+
 
