@@ -14,6 +14,7 @@ data Hand = TwoKind FaceValue
           | HighCard
           | Flush Suit
           | Straight FaceValue
+          | StraightFlush FaceValue Suit
           | FullHouse FaceValue FaceValue
   deriving (Eq, Ord, Show)
 
@@ -58,20 +59,23 @@ identify x =
       (is2K, t2) = ofAKind 2 x
       (isFlush, f1) = flush x
       (isStraight, s1) = straight x
-  in if isFlush then
-       Flush f1
-     else if is4K then
-            FourKind t4
-          else if isStraight then
-                 Straight s1
-               else if is3K && is2K then
-                      FullHouse t3 t2 
-                    else if is3K then
-                           ThreeKind t3
-                         else if is2K then
-                                TwoKind t2
-                              else HighCard
+  in if isFlush && isStraight then
+       StraightFlush s1 f1
+     else if isFlush then
+            Flush f1
+          else if is4K then
+                 FourKind t4
+               else if isStraight then
+                      Straight s1
+                    else if is3K && is2K then
+                           FullHouse t3 t2 
+                         else if is3K then
+                                ThreeKind t3
+                              else if is2K then
+                                     TwoKind t2
+                                   else HighCard
 
+winner :: [Hand] -> Hand
 winner = head . sort
   
 k2 = parseHand "H6 H2 D2 D8 C9"
@@ -80,6 +84,7 @@ k4 = parseHand "H2 H2 D2 D2 C9"
 fl = parseHand "H2 H5 H7 H10 H9"
 st = parseHand "H6 S3 H4 D5 H2"
 fh = parseHand "H2 H2 D2 D9 C9"
+stfl = parseHand "H6 H3 H4 H5 H2"
 
 rt = 
     identify k2 == TwoKind 2 &&
@@ -88,7 +93,8 @@ rt =
     identify fl == Flush Hearts &&
     identify fh == FullHouse 2 9 && -- three 2s higher
     identify st == Straight 6 &&
-    winner [k3, k2] == k3 &&
-    winner [k3, fl, k2] == fl
+    identify stfl == StraightFlush 6 Hearts 
+--    winner [k3, k2] == k3 &&
+--    winner [k3, fl, k2] == fl
 
 
