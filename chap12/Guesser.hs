@@ -8,14 +8,15 @@ data Suit = Clubs | Spades | Hearts | Diamonds
 
 type FaceValue = Int
 
-data Hand = TwoKind FaceValue
+data Hand = HighCard 
+          | TwoKind FaceValue
+          | TwoPair FaceValue FaceValue
           | ThreeKind FaceValue
-          | FourKind FaceValue
-          | HighCard
-          | Flush Suit
           | Straight FaceValue
-          | StraightFlush FaceValue Suit
+          | Flush Suit
           | FullHouse FaceValue FaceValue
+          | FourKind FaceValue
+          | StraightFlush FaceValue Suit
   deriving (Eq, Ord, Show)
 
 data Card = Card { fv :: FaceValue, s :: Suit } 
@@ -40,7 +41,6 @@ ofAKind num h =
   let kindGroup = filter (\x -> length x == num) $ grouped h
   in (isSeq kindGroup, (fv . head . head) kindGroup)
 
-
 flush x =
   let g = groupFn s x
   in (length (head g) == 5, (s . head . head) g)
@@ -53,6 +53,7 @@ straight cs =
       expected = [start..start+4]
   in (expected==fs, (head . reverse) fs)
 
+identify :: [Card] -> Hand
 identify x =
   let (is4K, t4) = ofAKind 4 x
       (is3K, t3) = ofAKind 3 x
@@ -76,25 +77,28 @@ identify x =
                                    else HighCard
 
 winner :: [Hand] -> Hand
-winner = head . sort
+winner = head . reverse . sort
   
-k2 = parseHand "H6 H2 D2 D8 C9"
-k3 = parseHand "H2 H2 D2 D8 C9"
-k4 = parseHand "H2 H2 D2 D2 C9"
-fl = parseHand "H2 H5 H7 H10 H9"
-st = parseHand "H6 S3 H4 D5 H2"
-fh = parseHand "H2 H2 D2 D9 C9"
-stfl = parseHand "H6 H3 H4 H5 H2"
+k2 = identify $ parseHand "H6 H2 D2 D8 C9"
+k3 = identify $ parseHand "H2 H2 D2 D8 C9"
+k4 = identify $ parseHand "H2 H2 D2 D2 C9"
+fl = identify $ parseHand "H2 H5 H7 H10 H9"
+st = identify $ parseHand "H6 S3 H4 D5 H2"
+fh = identify $ parseHand "H2 H2 D2 D9 C9"
+stfl = identify $ parseHand "H6 H3 H4 H5 H2"
+twoP = identify $ parseHand "H6 D6 H2 H5 H2"
+twoPC = parseHand "H6 D6 H2 H5 H2"
 
 rt = 
-    identify k2 == TwoKind 2 &&
-    identify k3 == ThreeKind 2 &&
-    identify k4 == FourKind 2 &&
-    identify fl == Flush Hearts &&
-    identify fh == FullHouse 2 9 && -- three 2s higher
-    identify st == Straight 6 &&
-    identify stfl == StraightFlush 6 Hearts 
---    winner [k3, k2] == k3 &&
---    winner [k3, fl, k2] == fl
+    k2 == TwoKind 2 &&
+    k3 == ThreeKind 2 &&
+    k4 == FourKind 2 &&
+    fl == Flush Hearts &&
+    fh == FullHouse 2 9 && -- three 2s higher
+    st == Straight 6 &&
+    stfl == StraightFlush 6 Hearts
+    && winner [k3, k2] == k3
+    && winner [k3, fl, k2] == fl
+    && winner [TwoKind 3, TwoKind 10] == TwoKind 10
 
 
