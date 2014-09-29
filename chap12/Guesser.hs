@@ -50,6 +50,14 @@ flush x =
 
 faces = map fv . sort
 
+-- replace 1 2 [1,2] 
+replace :: Eq a => a -> a -> [a] -> [a]
+replace needle with  [] = []  
+replace needle with (x:tail) =
+  if x == needle then
+    with : replace needle with tail
+  else x : replace needle with tail
+
 straight cs =
   let fs = faces cs
       start = head fs
@@ -62,15 +70,18 @@ identify x =
       (is3K, t3) = ofAKind 3 x
       (is2K, t2) = ofAKind 2 x
       (isFlush, f1) = flush x
-      (isStraight, s1) = straight x
+      (isStraightL, s1) = straight x
+      (isStraightH, s2) = straight $ replace (Card 1 Hearts) (Card 14 Hearts) x
+      isStraight = isStraightL || isStraightH
+      s = if isStraightL then s1 else s2
   in if isFlush && isStraight then
-       StraightFlush s1 f1
+       StraightFlush s f1
      else if isFlush then
             Flush f1
           else if is4K then
                  FourKind t4
                else if isStraight then
-                      Straight s1
+                      Straight s
                     else if is3K && is2K then
                            FullHouse t3 t2 
                          else if is3K then
@@ -88,7 +99,7 @@ k4 = identify $ parseHand "H2 H2 D2 D2 C9"
 fl = identify $ parseHand "H2 H5 H7 H10 H9"
 st = identify $ parseHand "H6 S3 H4 D5 H2"
 stal = identify $ parseHand "HA S3 H4 D5 H2"
--- stah = identify $ parseHand "H6 S3 H4 D5 H2"
+stah = identify $ parseHand "HA S10 H13 D12 H11"
 fh = identify $ parseHand "H2 H2 D2 D9 C9"
 stfl = identify $ parseHand "H6 H3 H4 H5 H2"
 twoP = identify $ parseHand "H6 D6 H2 H5 H2"
@@ -101,6 +112,8 @@ rt =
     fl == Flush Hearts &&
     fh == FullHouse 2 9 && -- three 2s higher
     st == Straight 6 &&
+    stal == Straight 5 &&
+    stah == Straight 14 &&
     stfl == StraightFlush 6 Hearts
     && winner [k3, k2] == k3
     && winner [k3, fl, k2] == fl
