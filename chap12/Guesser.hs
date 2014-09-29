@@ -27,8 +27,11 @@ parseSuit 'D' = Diamonds
 parseSuit 'C' = Clubs
 parseSuit 'S' = Spades
 
+parseNum "A" = 1
+parseNum x = read x
+
 -- parse "H2"
-parse str = Card  (read $ tail str)  (parseSuit $ head str)
+parse str = Card  (parseNum $ tail str)  (parseSuit $ head str)
 
 parseHand = map parse . words 
 
@@ -84,6 +87,8 @@ k3 = identify $ parseHand "H2 H2 D2 D8 C9"
 k4 = identify $ parseHand "H2 H2 D2 D2 C9"
 fl = identify $ parseHand "H2 H5 H7 H10 H9"
 st = identify $ parseHand "H6 S3 H4 D5 H2"
+stal = identify $ parseHand "HA S3 H4 D5 H2"
+-- stah = identify $ parseHand "H6 S3 H4 D5 H2"
 fh = identify $ parseHand "H2 H2 D2 D9 C9"
 stfl = identify $ parseHand "H6 H3 H4 H5 H2"
 twoP = identify $ parseHand "H6 D6 H2 H5 H2"
