@@ -1,4 +1,6 @@
 import Data.List 
+import Control.Monad
+import Data.Maybe
 
 empty = (==0) . length
 isSeq = not . empty
@@ -58,11 +60,40 @@ replace needle with (x:tail) =
     with : replace needle with tail
   else x : replace needle with tail
 
+
 straight cs =
   let fs = faces cs
       start = head fs
       expected = [start..start+4]
   in (expected==fs, (head . reverse) fs)
+
+newtype Parser a = Parser { runParser :: String -> Maybe (a, String) }
+
+satisfy :: ([Card] -> Bool) -> Parser [Card]
+satisfy p = Parser f
+  where
+    f [] = Nothing
+    f (x:xs)
+        | p x       = Just (x, xs)
+        | otherwise = Nothing
+
+isFlushF x = 
+  let (isFlush, f1) = flush x
+  in if isFlush then
+       Just $ Flush f1
+     else Nothing
+
+is4KF x =
+  let (is4K, t4) = ofAKind 4 x
+  in if is4K then
+       Just $ FourKind t4
+     else Nothing
+is3KF x =
+  let (is3K, t3) = ofAKind 3 x
+  in if is3K then
+       Just $ ThreeKind t3
+     else Nothing
+
 
 identify :: [Card] -> Hand
 identify x =
