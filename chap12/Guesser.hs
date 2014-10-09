@@ -1,6 +1,7 @@
 import Data.List 
 -- import Control.Monad
 import Data.Maybe
+import Data.Either
 
 empty = (==0) . length
 isSeq = not . empty
@@ -67,29 +68,29 @@ replace needle with (x:tail) =
     with : replace needle with tail
   else x : replace needle with tail
 
-data Parses = Parsed Hand
-            | Unparsed [Card]
-  deriving (Eq, Show)
-
 straight cs =
   let fs = faces cs
       start = head fs
       expected = [start..start+4]
-  in (expected==fs, (head . reverse) fs)
+  in (expected==fs, Straight $ (head . reverse) fs)
 
-(->>=) :: Parses -> ([Card] -> (Bool, Hand)) -> Parses
-Unparsed x ->>= f = 
-  let (is, h) = f x
+doE :: ([Card] -> (Bool, Hand)) -> [Card] -> Either Hand [Card] 
+doE f c = 
+  let (is, h) = f c
   in if is then
-       Parsed $ h
-     else Unparsed x
-x ->>= _ = x
+       Left h
+     else Right c
 
-identify :: [Card] -> Parses
+fourK = ofAKind 4
+threeK = ofAKind 3
+
+identify :: [Card] -> Either Hand [Card] 
 identify x =
-  Unparsed x ->>=
-  flush ->>=
-  ofAKind 4 ->>= ofAKind 3
+  Right x >>=
+  (doE flush) >>=
+  (doE fourK) >>=
+  (doE straight) >>=
+  (doE threeK)
 
 -- identify :: [Card] -> Hand
 -- identify x =
@@ -134,11 +135,11 @@ twoPC = parseHand "H6 D6 H2 H5 H2"
 
 rt = 
     -- k2 == TwoKind 2 &&
-    k3 == Parsed (ThreeKind 2) &&
-    k4 == Parsed (FourKind 2) &&
-    fl == Parsed (Flush Hearts)
+    k3 == (Left (ThreeKind 2)) &&
+    k4 == (Left (FourKind 2)) &&
+    fl == (Left (Flush Hearts))
     -- && fh == FullHouse 2 9 && -- three 2s higher
-    -- st == Straight 6 &&
+    && st == (Left $ Straight 6) 
     -- stal == Straight 5 &&
     -- stah == Straight 14 &&
     -- stfl == StraightFlush 6 Hearts
