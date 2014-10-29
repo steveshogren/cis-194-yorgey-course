@@ -1,13 +1,13 @@
 import Data.List 
--- import Control.Monad
 import Data.Maybe
 import Data.Either
+-- import Control.Monad
 
 empty = (==0) . length
 isSeq = not . empty
 
 data Suit = Clubs | Spades | Hearts | Diamonds
-  deriving (Eq, Ord, Show)
+          deriving (Eq, Ord, Show)
 
 type FaceValue = Int
 
@@ -20,11 +20,11 @@ data Hand = HighCard
           | FullHouse FaceValue FaceValue
           | FourKind FaceValue
           | StraightFlush FaceValue Suit
-  deriving (Eq, Ord, Show)
+          deriving (Eq, Ord, Show)
 
 data Card = Card { fv :: FaceValue, s :: Suit } 
-  deriving (Eq, Show, Ord)
-
+          deriving (Eq, Show, Ord)
+                   
 parseSuit 'H' = Hearts
 parseSuit 'D' = Diamonds
 parseSuit 'C' = Clubs
@@ -47,16 +47,20 @@ getOfKindType 3 = ThreeKind
 getOfKindType 4 = FourKind
 
 -- ofAKind 2 h1
+ofAKind :: Int -> [Card] -> Maybe Hand
 ofAKind num h =
   let kindGroup = filter (\x -> length x == num) $ grouped h
       nums = (fv . head . head) kindGroup
-  in (isSeq kindGroup, getOfKindType num $ nums)
+  in if (isSeq kindGroup)
+     then Just(getOfKindType num $ nums)
+     else Nothing
 
+flush :: [Card] -> Maybe Hand
 flush x =
   let g = groupFn s x
       isFlush = length (head g) == 5
       suit = (s . head . head) g
-  in (isFlush, Flush suit)
+  in if isFlush then Just (Flush suit) else Nothing
 
 faces = map fv . sort
 
@@ -68,18 +72,20 @@ replace needle with (x:tail) =
     with : replace needle with tail
   else x : replace needle with tail
 
+straight :: [Card] -> Maybe Hand
 straight cs =
   let fs = faces cs
       start = head fs
       expected = [start..start+4]
-  in (expected==fs, Straight $ (head . reverse) fs)
-
-doE :: ([Card] -> (Bool, Hand)) -> [Card] -> Either Hand [Card] 
+  in if (expected==fs)
+     then Just $ Straight $ (head . reverse) fs
+     else Nothing
+                                 
+doE :: ([Card] -> Maybe Hand) -> [Card] -> Either Hand [Card] 
 doE f c = 
-  let (is, h) = f c
-  in if is then
-       Left h
-     else Right c
+    case f c of
+      Nothing   -> Right c
+      Just hand -> Left hand
 
 fourK = ofAKind 4
 threeK = ofAKind 3
