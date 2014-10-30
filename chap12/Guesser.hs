@@ -89,6 +89,7 @@ doE f c =
 
 fourK = ofAKind 4
 threeK = ofAKind 3
+twoK = ofAKind 2
 
 identify :: [Card] -> Either Hand [Card] 
 identify x =
@@ -96,7 +97,8 @@ identify x =
   (doE flush) >>=
   (doE fourK) >>=
   (doE straight) >>=
-  (doE threeK)
+  (doE threeK) >>=
+  (doE twoK)
 
 -- identify :: [Card] -> Hand
 -- identify x =
@@ -139,8 +141,8 @@ stfl = identify $ parseHand "H6 H3 H4 H5 H2"
 twoP = identify $ parseHand "H6 D6 H2 H5 H2"
 twoPC = parseHand "H6 D6 H2 H5 H2"
 
-rt = 
-    -- k2 == TwoKind 2 &&
+rt =
+    k2 == (Left (TwoKind 2)) &&
     k3 == (Left (ThreeKind 2)) &&
     k4 == (Left (FourKind 2)) &&
     fl == (Left (Flush Hearts))
