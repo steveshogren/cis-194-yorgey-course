@@ -55,6 +55,7 @@ ofAKind num h =
      then Just(getOfKindType num $ nums)
      else Nothing
 
+
 flush :: [Card] -> Maybe Hand
 flush x =
   let g = groupFn s x
@@ -91,12 +92,19 @@ fourK = ofAKind 4
 threeK = ofAKind 3
 twoK = ofAKind 2
 
+straight :: [Card] -> Maybe Hand
+fullHouse h =
+  case (threeK h, twoK h) of
+   (Just(ThreeKind thf), Just(TwoKind tf)) -> Just $ FullHouse thf tf
+   _ -> Nothing
+
 identify :: [Card] -> Either Hand [Card] 
 identify x =
   Right x >>=
   (doE flush) >>=
   (doE fourK) >>=
   (doE straight) >>=
+  (doE fullHouse) >>=
   (doE threeK) >>=
   (doE twoK)
 
@@ -146,7 +154,7 @@ rt =
     k3 == (Left (ThreeKind 2)) &&
     k4 == (Left (FourKind 2)) &&
     fl == (Left (Flush Hearts))
-    -- && fh == FullHouse 2 9 && -- three 2s higher
+    && fh == (Left (FullHouse 2 9))  -- three 2s higher
     && st == (Left $ Straight 6) 
     -- stal == Straight 5 &&
     -- stah == Straight 14 &&
