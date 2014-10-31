@@ -46,7 +46,6 @@ getOfKindType 2 = TwoKind
 getOfKindType 3 = ThreeKind
 getOfKindType 4 = FourKind
 
--- ofAKind 2 h1
 ofAKind :: Int -> [Card] -> Maybe Hand
 ofAKind num h =
   let kindGroup = filter (\x -> length x == num) $ grouped h
@@ -54,7 +53,6 @@ ofAKind num h =
   in if (isSeq kindGroup)
      then Just(getOfKindType num $ nums)
      else Nothing
-
 
 flush :: [Card] -> Maybe Hand
 flush x =
@@ -73,14 +71,21 @@ replace needle with (x:tail) =
     with : replace needle with tail
   else x : replace needle with tail
 
-straight :: [Card] -> Maybe Hand
-straight cs =
+straightL :: [Card] -> Maybe Hand
+straightL cs =
   let fs = faces cs
       start = head fs
       expected = [start..start+4]
   in if (expected==fs)
      then Just $ Straight $ (head . reverse) fs
      else Nothing
+
+straight :: [Card] -> Maybe Hand          
+straight cs =
+  case (straight cs, straight $ replace (Card 1 Hearts) (Card 14 Hearts) cs) of
+  (Just s, Nothing) -> Just s
+  (Nothing, Just s) -> Just s
+  _ -> Nothing
                                  
 doE :: ([Card] -> Maybe Hand) -> [Card] -> Either Hand [Card] 
 doE f c = 
@@ -92,7 +97,7 @@ fourK = ofAKind 4
 threeK = ofAKind 3
 twoK = ofAKind 2
 
-straight :: [Card] -> Maybe Hand
+fullHouse :: [Card] -> Maybe Hand
 fullHouse h =
   case (threeK h, twoK h) of
    (Just(ThreeKind thf), Just(TwoKind tf)) -> Just $ FullHouse thf tf
@@ -118,21 +123,14 @@ identify x =
 --       (isStraightH, s2) = straight $ replace (Card 1 Hearts) (Card 14 Hearts) x
 --       isStraight = isStraightL || isStraightH
 --       s = if isStraightL then s1 else s2
---   in if isFlush && isStraight then
---        StraightFlush s f1
---      else if isFlush then
---             Flush f1
---           else if is4K then
---                  FourKind t4
---                else if isStraight then
---                       Straight s
---                     else if is3K && is2K then
---                            FullHouse t3 t2 
---                          else if is3K then
---                                 ThreeKind t3
---                               else if is2K then
---                                      TwoKind t2
---                                    else HighCard
+-- StraightFlush s f1
+-- Flush f1
+-- FourKind t4
+-- Straight s
+-- FullHouse t3 t2 
+-- ThreeKind t3
+-- TwoKind t2
+-- HighCard
 
 winner :: [Hand] -> Hand
 winner = head . reverse . sort
@@ -156,11 +154,10 @@ rt =
     fl == (Left (Flush Hearts))
     && fh == (Left (FullHouse 2 9))  -- three 2s higher
     && st == (Left $ Straight 6) 
-    -- stal == Straight 5 &&
-    -- stah == Straight 14 &&
+    && stal == (Left $ Straight 5) 
+    && stah == (Left $ Straight 14) 
     -- stfl == StraightFlush 6 Hearts
     -- && winner [k3, k2] == k3
     -- && winner [k3, fl, k2] == fl
     -- && winner [TwoKind 3, TwoKind 10] == TwoKind 10
-
 
