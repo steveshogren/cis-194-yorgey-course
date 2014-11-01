@@ -82,9 +82,9 @@ straightL cs =
 
 straight :: [Card] -> Maybe Hand          
 straight cs =
-  case (straight cs, straight $ replace (Card 1 Hearts) (Card 14 Hearts) cs) of
-  (Just s, Nothing) -> Just s
-  (Nothing, Just s) -> Just s
+  case (straightL cs, straightL $ replace (Card 1 Hearts) (Card 14 Hearts) cs) of
+  (Just s, _) -> Just s
+  (_, Just s) -> Just s
   _ -> Nothing
                                  
 doE :: ([Card] -> Maybe Hand) -> [Card] -> Either Hand [Card] 
