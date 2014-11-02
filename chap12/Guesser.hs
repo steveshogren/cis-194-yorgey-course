@@ -103,9 +103,16 @@ fullHouse h =
    (Just(ThreeKind thf), Just(TwoKind tf)) -> Just $ FullHouse thf tf
    _ -> Nothing
 
+straightflush :: [Card] -> Maybe Hand
+straightflush h =
+  case (straight h, flush h) of
+   (Just(Straight s), Just(Flush f)) -> Just $ StraightFlush s f
+   _ -> Nothing
+
 identify :: [Card] -> Either Hand [Card] 
 identify x =
   Right x >>=
+  (doE straightflush) >>=
   (doE flush) >>=
   (doE fourK) >>=
   (doE straight) >>=
@@ -156,7 +163,7 @@ rt =
     && st == (Left $ Straight 6) 
     && stal == (Left $ Straight 5) 
     && stah == (Left $ Straight 14) 
-    -- stfl == StraightFlush 6 Hearts
+    && stfl == (Left $ StraightFlush 6 Hearts)
     -- && winner [k3, k2] == k3
     -- && winner [k3, fl, k2] == fl
     -- && winner [TwoKind 3, TwoKind 10] == TwoKind 10
