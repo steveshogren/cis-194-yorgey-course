@@ -1,7 +1,7 @@
 import Data.List 
 import Data.Maybe
 import Data.Either
--- import Control.Monad
+import Control.Monad
 
 empty = (==0) . length
 isSeq = not . empty
@@ -135,6 +135,13 @@ stfl = identify $ parseHand "H6 H3 H4 H5 H2"
 twoP = identify $ parseHand "H6 D6 H2 H5 H2"
 twoPC = parseHand "H6 D6 H2 H5 H2"
 
+
+
+winnerRunner hands expected =
+  case (winner (lefts hands), expected) of
+   (actual, Left expected) -> actual == expected
+   _ -> False
+  
 rt =
     k2 == (Left (TwoKind 2)) &&
     k3 == (Left (ThreeKind 2)) &&
@@ -145,7 +152,7 @@ rt =
     && stal == (Left $ Straight 5) 
     && stah == (Left $ Straight 14) 
     && stfl == (Left $ StraightFlush 6 Hearts)
-   -- && winner [k3, k2] == k3
-   -- && winner [k3, fl, k2] == fl
-   -- && winner [TwoKind 3, TwoKind 10] == TwoKind 10
+    && winnerRunner [k3, k2] k3
+    && winnerRunner [k3, fl, k2] fl
+    && winner [TwoKind 3, TwoKind 10] == TwoKind 10
 
