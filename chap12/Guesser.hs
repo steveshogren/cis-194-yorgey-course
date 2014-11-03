@@ -120,25 +120,6 @@ identify x =
   (doE threeK) >>=
   (doE twoK)
 
--- identify :: [Card] -> Hand
--- identify x =
---   let (is4K, t4) = ofAKind 4 x
---       (is3K, t3) = ofAKind 3 x
---       (is2K, t2) = ofAKind 2 x
---       (isFlush, f1) = flush x
---       (isStraightL, s1) = straight x
---       (isStraightH, s2) = straight $ replace (Card 1 Hearts) (Card 14 Hearts) x
---       isStraight = isStraightL || isStraightH
---       s = if isStraightL then s1 else s2
--- StraightFlush s f1
--- Flush f1
--- FourKind t4
--- Straight s
--- FullHouse t3 t2 
--- ThreeKind t3
--- TwoKind t2
--- HighCard
-
 winner :: [Hand] -> Hand
 winner = head . reverse . sort
   
@@ -164,7 +145,7 @@ rt =
     && stal == (Left $ Straight 5) 
     && stah == (Left $ Straight 14) 
     && stfl == (Left $ StraightFlush 6 Hearts)
-    -- && winner [k3, k2] == k3
-    -- && winner [k3, fl, k2] == fl
-    -- && winner [TwoKind 3, TwoKind 10] == TwoKind 10
+   -- && winner [k3, k2] == k3
+   -- && winner [k3, fl, k2] == fl
+   -- && winner [TwoKind 3, TwoKind 10] == TwoKind 10
 
