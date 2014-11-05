@@ -135,23 +135,24 @@ stfl = identify $ parseHand "H6 H3 H4 H5 H2"
 twoP = identify $ parseHand "H6 D6 H2 H5 H2"
 twoPC = parseHand "H6 D6 H2 H5 H2"
 
-
-
 winnerRunner hands expected =
   case (winner (lefts hands), expected) of
    (actual, Left expected) -> actual == expected
    _ -> False
+
+ast actual expected =
+  actual == (Left expected)
   
 rt =
-    k2 == (Left (TwoKind 2)) &&
-    k3 == (Left (ThreeKind 2)) &&
-    k4 == (Left (FourKind 2)) &&
-    fl == (Left (Flush Hearts))
-    && fh == (Left (FullHouse 2 9))  -- three 2s higher
-    && st == (Left $ Straight 6) 
-    && stal == (Left $ Straight 5) 
-    && stah == (Left $ Straight 14) 
-    && stfl == (Left $ StraightFlush 6 Hearts)
+    ast k2 (TwoKind 2)
+    && ast k3 (ThreeKind 2)
+    && ast k4 (FourKind 2)
+    && ast fl (Flush Hearts)
+    && ast fh (FullHouse 2 9)  -- three 2s higher
+    && ast st (Straight 6) 
+    && ast stal (Straight 5)
+    && ast stah (Straight 14) 
+    && ast stfl (StraightFlush 6 Hearts)
     && winnerRunner [k3, k2] k3
     && winnerRunner [k3, fl, k2] fl
     && winner [TwoKind 3, TwoKind 10] == TwoKind 10
