@@ -127,13 +127,6 @@ k2 = identify $ parseHand "H6 H2 D2 D8 C9"
 k3 = identify $ parseHand "H2 H2 D2 D8 C9"
 k4 = identify $ parseHand "H2 H2 D2 D2 C9"
 fl = identify $ parseHand "H2 H5 H7 H10 H9"
-st = identify $ parseHand "H6 S3 H4 D5 H2"
-stal = identify $ parseHand "HA S3 H4 D5 H2"
-stah = identify $ parseHand "HA S10 H13 D12 H11"
-fh = identify $ parseHand "H2 H2 D2 D9 C9"
-stfl = identify $ parseHand "H6 H3 H4 H5 H2"
-twoP = identify $ parseHand "H6 D6 H2 H5 H2"
-twoPC = parseHand "H6 D6 H2 H5 H2"
 
 winnerRunner hands expected =
   case (winner (lefts hands), expected) of
@@ -141,18 +134,18 @@ winnerRunner hands expected =
    _ -> False
 
 ast actual expected =
-  actual == (Left expected)
+  (identify (parseHand actual)) == (Left expected)
   
 rt =
-    ast k2 (TwoKind 2)
-    && ast k3 (ThreeKind 2)
-    && ast k4 (FourKind 2)
-    && ast fl (Flush Hearts)
-    && ast fh (FullHouse 2 9)  -- three 2s higher
-    && ast st (Straight 6) 
-    && ast stal (Straight 5)
-    && ast stah (Straight 14) 
-    && ast stfl (StraightFlush 6 Hearts)
+    ast "H6 H2 D2 D8 C9" (TwoKind 2)
+    && ast "H2 H2 D2 D8 C9" (ThreeKind 2)
+    && ast "H2 H2 D2 D2 C9" (FourKind 2)
+    && ast "H2 H5 H7 H10 H9" (Flush Hearts)
+    && ast "H2 H2 D2 D9 C9" (FullHouse 2 9)  -- three 2s higher
+    && ast "H6 S3 H4 D5 H2" (Straight 6) 
+    && ast "HA S3 H4 D5 H2" (Straight 5)
+    && ast "HA S10 H13 D12 H11" (Straight 14) 
+    && ast "H6 H3 H4 H5 H2" (StraightFlush 6 Hearts)
     && winnerRunner [k3, k2] k3
     && winnerRunner [k3, fl, k2] fl
     && winner [TwoKind 3, TwoKind 10] == TwoKind 10
