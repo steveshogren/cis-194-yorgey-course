@@ -54,6 +54,16 @@ ofAKind num h =
      then Just(getOfKindType num $ nums)
      else Nothing
 
+twoPair :: [Card] -> Maybe Hand
+twoPair h =
+  let kindGroup = filter (\x -> length x == 2) $ grouped h
+  in if length kindGroup == 2 
+     then
+       let fnum = (fv . head . head) kindGroup
+           snum = (fv . head . head . tail) kindGroup
+       in Just(TwoPair fnum snum)
+     else Nothing
+
 flush :: [Card] -> Maybe Hand
 flush x =
   let g = groupFn s x
@@ -117,6 +127,7 @@ identify x =
   (doE fourK) >>=
   (doE straight) >>=
   (doE fullHouse) >>=
+  (doE twoPair) >>=
   (doE threeK) >>=
   (doE twoK)
 
@@ -145,6 +156,7 @@ rt =
   foldr ast [] [("H6 H2 D2 D8 C9", (TwoKind 2)),
                 ("H2 H2 D2 D8 C9", (ThreeKind 2)),
                 ("H2 H2 D2 D2 C9", (FourKind 2)),
+                ("H2 H2 D9 D9 C3", (TwoPair 2 9)),
                 ("H2 H5 H7 H10 H9", (Flush Hearts)),
                 ("H2 H2 D2 D9 C9", (FullHouse 2 9)),  -- three 2s higher
                 ("H6 S3 H4 D5 H2", (Straight 6)) ,
@@ -152,7 +164,7 @@ rt =
                 ("HA S10 H13 D12 H11", (Straight 14)),
                 ("H6 H3 H4 H5 H2", (StraightFlush 6 Hearts))]
 
-    -- && winnerRunner [k3, k2] k3
-    -- && winnerRunner [k3, fl, k2] fl
-    -- && winner [TwoKind 3, TwoKind 10] == TwoKind 10
+rot = winnerRunner [k3, k2] k3
+      && winnerRunner [k3, fl, k2] fl
+      && winner [TwoKind 3, TwoKind 10] == TwoKind 10
 
