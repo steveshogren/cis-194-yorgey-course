@@ -11,7 +11,7 @@ data Suit = Clubs | Spades | Hearts | Diamonds
 
 type FaceValue = Int
 
-data Hand = HighCard 
+data Hand = HighCard Card
           | TwoKind FaceValue
           | TwoPair FaceValue FaceValue
           | ThreeKind FaceValue
@@ -119,6 +119,11 @@ straightflush h =
    (Just(Straight s), Just(Flush f)) -> Just $ StraightFlush s f
    _ -> Nothing
 
+highCard :: [Card] -> Maybe Hand
+highCard h =
+  let highest = (head . reverse . sort) h
+  in Just $ HighCard highest
+
 identify :: [Card] -> Either Hand [Card] 
 identify x =
   Right x >>=
@@ -129,7 +134,8 @@ identify x =
   (doE fullHouse) >>=
   (doE twoPair) >>=
   (doE threeK) >>=
-  (doE twoK)
+  (doE twoK) >>=
+  (doE highCard)
 
 winner :: [Hand] -> Hand
 winner = head . reverse . sort
@@ -155,6 +161,7 @@ ast (actual, expected) state =
 rt =
   foldr ast [] [("H6 H2 D2 D8 C9", (TwoKind 2)),
                 ("H2 H2 D2 D8 C9", (ThreeKind 2)),
+                ("H10 H2 D3 D8 C9", (HighCard $ Card 10 Hearts)),
                 ("H2 H2 D2 D2 C9", (FourKind 2)),
                 ("H2 H2 D9 D9 C3", (TwoPair 2 9)),
                 ("H2 H5 H7 H10 H9", (Flush Hearts)),
