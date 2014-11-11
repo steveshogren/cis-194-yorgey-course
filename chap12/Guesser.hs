@@ -2,9 +2,7 @@ import Data.List
 import Data.Maybe
 import Data.Either
 import Control.Monad
-
-empty = (==0) . length
-isSeq = not . empty
+import Helpers
 
 data Suit = Clubs | Spades | Hearts | Diamonds
           deriving (Eq, Ord, Show)
@@ -38,9 +36,7 @@ parse str = Card  (parseNum $ tail str)  (parseSuit $ head str)
 
 parseHand = map parse . words 
 
-groupFn f = groupBy (\c1 c2 -> (==) (f c1) (f c2)) 
-
-grouped = groupFn fv . sort 
+groupedByFv = groupEqual fv . sort 
 
 getOfKindType 2 = TwoKind
 getOfKindType 3 = ThreeKind
@@ -48,7 +44,7 @@ getOfKindType 4 = FourKind
 
 ofAKind :: Int -> [Card] -> Maybe Hand
 ofAKind num h =
-  let kindGroup = filter (\x -> length x == num) $ grouped h
+  let kindGroup = filter (\x -> length x == num) $ groupedByFv h
       nums = (fv . head . head) kindGroup
   in if (isSeq kindGroup)
      then Just(getOfKindType num $ nums)
@@ -56,7 +52,7 @@ ofAKind num h =
 
 twoPair :: [Card] -> Maybe Hand
 twoPair h =
-  let kindGroup = filter (\x -> length x == 2) $ grouped h
+  let kindGroup = filter (\x -> length x == 2) $ groupedByFv h
   in if length kindGroup == 2 
      then
        let fnum = (fv . head . head) kindGroup
@@ -66,7 +62,7 @@ twoPair h =
 
 flush :: [Card] -> Maybe Hand
 flush x =
-  let g = groupFn s x
+  let g = groupEqual s x
       isFlush = length (head g) == 5
       suit = (s . head . head) g
   in if isFlush then Just (Flush suit) else Nothing
