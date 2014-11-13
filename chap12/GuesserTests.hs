@@ -4,6 +4,12 @@ import Data.Either
 import Control.Monad
 import Guesser
 
+runner :: Show a => Eq a => (a, a) -> [String] -> [String]
+runner (actual, expected) state =
+  if actual == expected
+  then state
+  else ("FAILED  Actual: " ++ (show actual) ++ " -> Expected: " ++ (show expected)) : state 
+
 ast :: (String, Hand) -> [String] -> [String]
 ast (actual, expected) state =
   let actu = (identify (parseHand actual))
@@ -30,6 +36,10 @@ k3 = ThreeKind 2
 k4 = FourKind 2
 fl = Flush Hearts
 
-rot = winner [k3, k2] == k3
-      && winner [k3, fl, k2] == fl
-      && winner [TwoKind 3, TwoKind 10] == TwoKind 10
+
+rot =
+  foldr runner [] [(winner [k3, k2], k3),
+                   (winner [k3, fl, k2], fl),
+                   (winner [TwoKind 3, TwoKind 10], TwoKind 10)]
+
+at = rt ++ rot
