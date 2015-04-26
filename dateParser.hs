@@ -13,15 +13,15 @@ import System.Time.Utils
 toInt :: String -> Int
 toInt = read
 
+getCommitDates repoPath = do
+  hout <- readProcess "git" ["log", "-3", "--pretty=format:\"%at\""] repoPath
+  let x =  splitOn "\n" hout
+  return $ map (epochToClockTime . toInt . replace "\"" "") x
+
 main :: IO()
 main = do
-  -- let t = withRepository lgFactory ((parent . fromText) "/home/jack/programming/sicp/.git") False
-  hout <- readProcess "git" ["log", "-3", "--pretty=format:\"%at\""] "/home/jack/programming/sicp"
-  let x =  splitOn "\n" hout
-  let n = map (epochToClockTime . toInt . (replace "\"" "")) x
-  print n
-  -- let x = traverseCommits 
-  
-  -- let path =  "/home/jack/programming/"
-  -- onlyGits <- find always (fileType ==? Directory &&? fileName ==? ".git") path
-  -- print onlyGits
+  let path =  "/home/jack/programming/"
+  onlyGits <- find (depth ==? 0 ||? depth ==? 1) (System.FilePath.Find.contains ".git") path
+  -- times <- map getCommitDates onlyGits
+  -- print times
+  print onlyGits
