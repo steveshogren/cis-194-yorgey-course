@@ -79,7 +79,7 @@ parse ["-c"] = getOldestMissing
 parse [] = getOldestMissing
 
 usage :: IO ()
-usage   = putStrLn "Usage: gitCleaner [-vhcn] "
+usage   = putStrLn "Usage: gitCleaner [-vhc] "
 version :: IO ()
 version = putStrLn "Haskell gitCleaner 0.1"
 exit :: IO a
