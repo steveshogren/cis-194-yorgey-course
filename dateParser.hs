@@ -15,6 +15,10 @@ import System.Environment
 import System.Exit
 import Data.Time
 import Control.Applicative ((<$>))
+import qualified Data.Set as Set
+
+type ExpectedDays = [String]
+type ActualDays = [String]
 
 toInt :: String -> Int
 toInt = read
@@ -33,7 +37,7 @@ stringNDaysAgo n = do
   time <- liftM2 utcToLocalTime getCurrentTimeZone getCurrentTime
   return $ showGregorian $ addDays (-n) $ localDay time
 
-generateLastNDays :: Integer -> IO [String]
+generateLastNDays :: Integer -> IO ExpectedDays
 generateLastNDays n = liftM reverse $ mapM stringNDaysAgo [0..(n-1)]
 
 convertClockToString :: ClockTime -> IO String
@@ -41,9 +45,9 @@ convertClockToString clk = do
   ct <- toCalendarTime clk
   return $ formatCalendarTime defaultTimeLocale "%Y-%m-%d" ct
 
-firstMissing :: Eq a => [a] -> [a] -> a
-firstMissing (expected:exs) (actual:acs) =
-  if expected /= actual then expected else firstMissing exs acs
+firstMissing :: ExpectedDays -> Set.Set String -> String
+firstMissing (expected:exs) actual =
+  if Set.notMember expected actual then expected else firstMissing exs actual
 
 getTime :: IO String
 getTime =
@@ -54,20 +58,25 @@ makeDateString :: String -> String -> String
 makeDateString t d =
   "    --date=\"" ++ d ++ " " ++ t ++ "\""
 
-getOldestMissing :: IO ()
-getOldestMissing = do
+getLastNGitCommitDays :: Int -> IO ActualDays
+getLastNGitCommitDays n = do
   let path =  "/home/jack/programming/"
   onlyGits <- find (depth <=? 3) (fileName ==? ".git") path
   times <- mapM getCommitDates $ onlyGits ++ ["/home/jack/.emacs.bak/.git", "/home/jack/.emacs.d/private/.git"]
   grouped <- liftM group $ mapM convertClockToString . sort . concat $ times
   let uniqueDays = map head grouped
-  let actualDays = lastN 40 uniqueDays
+  return $ lastN n uniqueDays
+
+getOldestMissing :: IO ()
+getOldestMissing = do
+  actualDays <- getLastNGitCommitDays 40
   expectedDays <- generateLastNDays 40
+  let actual = Set.fromList actualDays
 
   if expectedDays == actualDays then print ()
   else do
     time <- getTime
-    putStrLn $ makeDateString time $ firstMissing  expectedDays  actualDays
+    putStrLn $ makeDateString time $ firstMissing expectedDays actual
 
 main :: IO ()
 main = getArgs >>= parse
