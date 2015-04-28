@@ -65,7 +65,7 @@ getBashGui = do
   actualDays <- getLastNGitCommitDays 10
   expectedDays <- generateLastNDays 10
   let actual = Set.fromList actualDays
-  putStrLn $ foldl (\acc next -> acc ++ getDayString next actual) "(5) " expectedDays
+  putStrLn $ foldl (\acc next -> acc ++ getDayString next actual) "" expectedDays
 
 main :: IO ()
 main = getArgs >>= parse
