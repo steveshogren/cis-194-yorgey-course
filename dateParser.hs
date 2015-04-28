@@ -1,7 +1,6 @@
 import System.FilePath
 import Data.String.Utils
-import Data.List (group, sort)
-import Control.Monad
+import Data.List (sort, nub)
 import System.FilePath.Find
 import System.Process
 import Data.List.Split (splitOn)
@@ -9,15 +8,14 @@ import System.Time.Utils
 import System.Time
 import System.Locale
 import Data.Time.Clock ()
+import Control.Monad(liftM)
 import Data.Time.Calendar ()
 import Data.Time.LocalTime ()
 import System.Environment
 import System.Exit
-import Data.Time
-import Control.Applicative ((<$>))
+import DateStuff (ExpectedDays, generateLastNDays , getTime, makeDateString)
 import qualified Data.Set as Set
 
-type ExpectedDays = [String]
 type ActualDays = [String]
 
 toInt :: String -> Int
@@ -32,14 +30,6 @@ getCommitDates repoPath = do
   let x =  splitOn "\n" hout
   return $ map (epochToClockTime . toInt . replace "\"" "") x
 
-stringNDaysAgo :: Integer -> IO String
-stringNDaysAgo n = do
-  time <- liftM2 utcToLocalTime getCurrentTimeZone getCurrentTime
-  return $ showGregorian $ addDays (-n) $ localDay time
-
-generateLastNDays :: Integer -> IO ExpectedDays
-generateLastNDays n = liftM reverse $ mapM stringNDaysAgo [0..(n-1)]
-
 convertClockToString :: ClockTime -> IO String
 convertClockToString clk = do
   ct <- toCalendarTime clk
@@ -49,23 +39,12 @@ firstMissing :: ExpectedDays -> Set.Set String -> String
 firstMissing (expected:exs) actual =
   if Set.notMember expected actual then expected else firstMissing exs actual
 
-getTime :: IO String
-getTime =
-  formatTime defaultTimeLocale "%H:%M:%S"
-  <$> liftM2 utcToLocalTime getCurrentTimeZone getCurrentTime
-
-makeDateString :: String -> String -> String
-makeDateString t d =
-  "    --date=\"" ++ d ++ " " ++ t ++ "\""
-
 getLastNGitCommitDays :: Int -> IO ActualDays
 getLastNGitCommitDays n = do
   let path =  "/home/jack/programming/"
   onlyGits <- find (depth <=? 3) (fileName ==? ".git") path
   times <- mapM getCommitDates $ onlyGits ++ ["/home/jack/.emacs.bak/.git", "/home/jack/.emacs.d/private/.git"]
-  grouped <- liftM group $ mapM convertClockToString . sort . concat $ times
-  let uniqueDays = map head grouped
-  return $ lastN n uniqueDays
+  liftM (lastN n . nub) $ mapM convertClockToString . sort . concat $ times
 
 getOldestMissing :: IO ()
 getOldestMissing = do
@@ -73,7 +52,7 @@ getOldestMissing = do
   expectedDays <- generateLastNDays 40
   let actual = Set.fromList actualDays
 
-  if expectedDays == actualDays then print ()
+  if expectedDays == actualDays then putStrLn ""
   else do
     time <- getTime
     putStrLn $ makeDateString time $ firstMissing expectedDays actual
@@ -92,7 +71,7 @@ usage   = putStrLn "Usage: gitCleaner [-vhc] "
 version :: IO ()
 version = putStrLn "Haskell gitCleaner 0.1"
 exit :: IO a
-exit    = exitWith ExitSuccess
+exit    = exitSuccess
 die :: IO a
 die     = exitWith (ExitFailure 1)
 
