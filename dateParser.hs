@@ -2,7 +2,7 @@ import System.FilePath
 import Data.String.Utils
 import Data.List (sort, nub)
 import System.FilePath.Find
-import System.Process
+import System.Process (readProcess)
 import Data.List.Split (splitOn)
 import System.Time.Utils
 import System.Time
@@ -24,11 +24,23 @@ toInt = read
 lastN :: Int -> [a] -> [a]
 lastN n xs = foldl (const .drop 1) xs (drop n xs)
 
+getGitDirectories :: IO [FilePath]
+getGitDirectories = do
+  let path =  "/home/jack/programming/"
+  onlyGits <- find (depth <=? 3) (fileName ==? ".git") path
+  return $ onlyGits ++ ["/home/jack/.emacs.bak/.git", "/home/jack/.emacs.d/private/.git"]
+
 getCommitDates :: String -> IO [ClockTime]
 getCommitDates repoPath = do
   hout <- readProcess "git" ["--git-dir", repoPath, "log", "--pretty=format:\"%at\""] "."
   let x =  splitOn "\n" hout
   return $ map (epochToClockTime . toInt . replace "\"" "") x
+
+updateGitHooks :: IO ()
+updateGitHooks = do
+  gitDirs <- getGitDirectories
+  results <- mapM (\dir -> readProcess "cp" ["/home/jack/.git_template/hooks/post-commit", dir ++ "/hooks/."] ".") gitDirs
+  putStrLn . (++ " Success!") . concat $ results
 
 convertClockToString :: ClockTime -> IO String
 convertClockToString clk = do
@@ -41,9 +53,8 @@ firstMissing (expected:exs) actual =
 
 getLastNGitCommitDays :: Int -> IO ActualDays
 getLastNGitCommitDays n = do
-  let path =  "/home/jack/programming/"
-  onlyGits <- find (depth <=? 3) (fileName ==? ".git") path
-  times <- mapM getCommitDates $ onlyGits ++ ["/home/jack/.emacs.bak/.git", "/home/jack/.emacs.d/private/.git"]
+  gitDirs <- getGitDirectories
+  times <- mapM getCommitDates gitDirs
   liftM (lastN n . nub) $ mapM convertClockToString . sort . concat $ times
 
 getOldestMissing :: IO ()
@@ -61,6 +72,7 @@ getDayString :: String -> Set.Set String -> String
 getDayString expected actuals =
   if Set.member expected actuals then "X" else "_"
 
+getBashGui :: IO ()
 getBashGui = do
   actualDays <- getLastNGitCommitDays 10
   expectedDays <- generateLastNDays 10
@@ -75,6 +87,7 @@ parse ["-h"] = usage   >> exit
 parse ["-v"] = version >> exit
 parse ["-c"] = getOldestMissing
 parse ["-b"] = getBashGui
+parse ["-u"] = updateGitHooks
 parse [] = getOldestMissing
 
 usage :: IO ()
