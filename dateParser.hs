@@ -72,12 +72,22 @@ getDayString :: String -> Set.Set String -> String
 getDayString expected actuals =
   if Set.member expected actuals then "X" else "_"
 
-getBashGui :: IO ()
+printBashGui :: IO ()
+printBashGui = do
+  gui <- getBashGui
+  putStrLn gui
+
+getBashGui :: IO String
 getBashGui = do
   actualDays <- getLastNGitCommitDays 10
   expectedDays <- generateLastNDays 10
   let actual = Set.fromList actualDays
-  putStrLn $ foldl (\acc next -> acc ++ getDayString next actual) "" expectedDays
+  return $ foldl (\acc next -> acc ++ getDayString next actual) "" expectedDays
+
+updateGitBashGui :: IO ()
+updateGitBashGui = do
+  gui <- getBashGui
+  writeFile "/home/jack/programming/haskell-course/guifile" gui
 
 main :: IO ()
 main = getArgs >>= parse
@@ -86,8 +96,9 @@ parse :: [String] -> IO ()
 parse ["-h"] = usage   >> exit
 parse ["-v"] = version >> exit
 parse ["-c"] = getOldestMissing
-parse ["-b"] = getBashGui
+parse ["-b"] = printBashGui
 parse ["-u"] = updateGitHooks
+parse ["-w"] = updateGitBashGui
 parse [] = getOldestMissing
 
 usage :: IO ()
