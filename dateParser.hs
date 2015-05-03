@@ -99,12 +99,12 @@ parse ["-c"] = getOldestMissing
 parse ["-b"] = printBashGui
 parse ["-u"] = updateGitHooks
 parse ["-w"] = updateGitBashGui
-parse [] = getOldestMissing
+parse [] = usage >> exit
 
 usage :: IO ()
-usage   = putStrLn "Usage: gitCleaner [-vhc] "
+usage   = putStrLn "Usage: dateParser \n [-v version]\n [-h help]\n [-c find oldest missing]\n [-b print bash gui] \n [-w write bash file]"
 version :: IO ()
-version = putStrLn "Haskell gitCleaner 0.1"
+version = putStrLn "Haskell dateParser 1.0"
 exit :: IO a
 exit    = exitSuccess
 die :: IO a
