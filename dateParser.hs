@@ -102,7 +102,7 @@ parse ["-w"] = updateGitBashGui
 parse [] = usage >> exit
 
 usage :: IO ()
-usage   = putStrLn "Usage: dateParser \n [-v version]\n [-h help]\n [-c find oldest missing]\n [-b print bash gui] \n [-w write bash file]"
+usage   = putStrLn "Usage: dateParser \n [-v version]\n [-h help]\n [-c find oldest missing]\n [-b print bash gui] \n [-w write bash file] \n [-u update all git hooks]"
 version :: IO ()
 version = putStrLn "Haskell dateParser 1.0"
 exit :: IO a
