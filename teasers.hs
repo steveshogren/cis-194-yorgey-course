@@ -1,4 +1,6 @@
-
+{-# LANGUAGE NoMonomorphismRestriction #-}
+import Data.List(groupBy, sortBy)
+import Data.Function(on)
 
 combine :: [a] -> [a] -> [a]
 combine [] [] = []
@@ -14,3 +16,13 @@ iFib n prev next acc =
 
 nthFib n = reverse $ iFib n 0 1 [0]
 
+firstDigit = head . show
+firstDigitOfList = firstDigit . head
+
+sortLargestTotal n =
+  reverse $
+  sortBy (compare `on` firstDigitOfList) $
+         groupBy ((==) `on` firstDigit) n
+
+main :: IO ()
+main = putStrLn "test"
