@@ -1,25 +1,23 @@
+{-# LANGUAGE TupleSections #-}
 
-data Suit = Clubs | Spades | Hearts | Diamonds
-          deriving (Eq, Ord, Show)
+import Data.Time
+import Control.Monad
+import Control.Applicative
 
-type FaceValue = Int
+day (_, _, d) = d
 
-data Hand = HighCard Card
-          | TwoKind FaceValue
-          | TwoPair FaceValue FaceValue
-          | ThreeKind FaceValue
-          | Straight FaceValue
-          | Flush Suit
-          | FullHouse FaceValue FaceValue
-          | FourKind FaceValue
-          | StraightFlush FaceValue Suit
-          deriving (Eq, Ord, Show)
+todayPlus :: Integer -> IO Int
+todayPlus days =
+  liftM (day . toGregorian . addDays days . utctDay) getCurrentTime
 
-data Card = Card { fv :: FaceValue, s :: Suit } 
-          deriving (Eq, Show, Ord)
+buildDate :: Integer -> Integer -> IO (Integer, Int)
+buildDate goal daysFuture =
+  ((goal * daysFuture) + 2800, ) <$> todayPlus daysFuture
 
-parse :: String -> Hand
-parse = HighCard $ Card 3 Spades
+dailyCounts goal =
+  sequence $ fmap (buildDate goal) [1..30]
 
 main :: IO ()
-main = print $ parse "H2 D4 C3 S8 S9"
+main = do
+  t <- dailyCounts 333
+  print t
