@@ -6,18 +6,18 @@ import Control.Applicative
 
 day (_, _, d) = d
 
-todayPlus :: Integer -> IO Int
-todayPlus days =
-  liftM (day . toGregorian . addDays days . utctDay) getCurrentTime
+addToDay :: UTCTime -> Integer -> Int
+addToDay today days =
+  day . toGregorian . addDays days . utctDay $ today
 
-buildDate :: Integer -> Integer -> IO (Integer, Int)
-buildDate goal daysFuture =
-  ((goal * daysFuture) + 2800, ) <$> todayPlus daysFuture
+buildDate goal today daysFuture =
+  let dayNumber = addToDay today daysFuture
+  in ((goal * daysFuture) + 2800, dayNumber)
 
-dailyCounts goal =
-  sequence $ fmap (buildDate goal) [1..30]
+dailyCounts goal today =
+ fmap (buildDate goal today) [1..30]
 
 main :: IO ()
 main = do
-  t <- dailyCounts 333
-  print t
+  today <- getCurrentTime
+  print $ dailyCounts 333 today
