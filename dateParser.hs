@@ -1,7 +1,5 @@
-import System.FilePath
 import Data.String.Utils
 import Data.List (sort, nub)
-import System.FilePath.Find
 import System.Process (readProcess)
 import Data.List.Split (splitOn)
 import System.Time.Utils
@@ -13,6 +11,7 @@ import Data.Time.Calendar ()
 import Data.Time.LocalTime ()
 import System.Environment
 import System.Exit
+import LookupGitDirs (getGitDirectories)
 import DateStuff (ExpectedDays, generateLastNDays , getTime, makeDateString)
 import qualified Data.Set as Set
 
@@ -23,12 +22,6 @@ toInt = read
 
 lastN :: Int -> [a] -> [a]
 lastN n xs = foldl (const .drop 1) xs (drop n xs)
-
-getGitDirectories :: IO [FilePath]
-getGitDirectories = do
-  let path =  "/home/jack/programming/"
-  onlyGits <- find (depth <=? 3) (fileName ==? ".git") path
-  return $ onlyGits ++ ["/home/jack/.emacs.bak/.git", "/home/jack/.emacs.d/private/.git"]
 
 getCommitDates :: String -> IO [ClockTime]
 getCommitDates repoPath = do
