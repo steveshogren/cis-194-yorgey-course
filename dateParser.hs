@@ -11,7 +11,7 @@ import Data.Time.Calendar ()
 import Data.Time.LocalTime ()
 import System.Environment
 import System.Exit
-import LookupGitDirs (getGitDirectories)
+import LookupGitDirs (getGitDirectories, getGits)
 import DateStuff (ExpectedDays, generateLastNDays , getTime, makeDateString)
 import qualified Data.Set as Set
 
@@ -82,8 +82,14 @@ updateGitBashGui = do
   gui <- getBashGui
   writeFile "/home/jack/programming/haskell-course/guifile" gui
 
+printGitDirsWithCurrents :: IO ()
+printGitDirsWithCurrents = do
+  output <- getGits
+  print output
+
 main :: IO ()
 main = getArgs >>= parse
+
 
 parse :: [String] -> IO ()
 parse ["-h"] = usage   >> exit
@@ -92,6 +98,7 @@ parse ["-c"] = getOldestMissing
 parse ["-b"] = printBashGui
 parse ["-u"] = updateGitHooks
 parse ["-w"] = updateGitBashGui
+parse ["-r"] = printGitDirsWithCurrents
 parse [] = usage >> exit
 
 usage :: IO ()

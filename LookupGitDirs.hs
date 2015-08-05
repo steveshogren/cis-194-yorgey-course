@@ -1,4 +1,4 @@
-module LookupGitDirs (getGitDirectories) where
+module LookupGitDirs (getGitDirectories, getGits) where
 
 import System.FilePath.Find (FindClause, find, fileName, depth, (<=?), (==?), (/~?), (&&?), filePath)
 import Control.Monad
@@ -26,6 +26,7 @@ listGitDirsWithCurrentChanges repoPath = do
   (code,stdout,_) <- readProcessWithExitCode "git" ["--git-dir", repoPath, "rev-list", "current", "^master", "--no-merges"] "."
   return $ if code == ExitSuccess then Just (repoPath,words stdout) else Nothing
 
+getGits :: IO [(String, [String])]
 getGits = do
   gits <- getGitDirectories
   dires <- mapM listGitDirsWithCurrentChanges gits
