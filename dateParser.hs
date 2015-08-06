@@ -82,14 +82,21 @@ updateGitBashGui = do
   gui <- getBashGui
   writeFile "/home/jack/programming/haskell-course/guifile" gui
 
+printSingleGitCurrent :: (String, [String]) -> String
+printSingleGitCurrent (_ , []) = ""
+printSingleGitCurrent (path, shas) =
+  let oldest = head . lastN 1 $ shas
+      total = show . length $ shas
+  in total ++ ": " ++ path ++ "  " ++ oldest
+
 printGitDirsWithCurrents :: IO ()
 printGitDirsWithCurrents = do
   output <- getGits
-  print output
+  let x = concatMap printSingleGitCurrent output
+  print x
 
 main :: IO ()
 main = getArgs >>= parse
-
 
 parse :: [String] -> IO ()
 parse ["-h"] = usage   >> exit
