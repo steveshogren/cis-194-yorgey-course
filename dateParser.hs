@@ -105,7 +105,7 @@ parse ["-c"] = getOldestMissing
 parse ["-b"] = printBashGui
 parse ["-u"] = updateGitHooks
 parse ["-w"] = updateGitBashGui
-parse ["-r"] = printGitDirsWithCurrents
+parse ["-r"] = printGitDirsWithCurrents >> getOldestMissing
 parse [] = usage >> exit
 
 usage :: IO ()
