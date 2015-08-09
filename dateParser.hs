@@ -50,16 +50,21 @@ getLastNGitCommitDays n = do
   times <- mapM getCommitDates gitDirs
   liftM (lastN n . nub) $ mapM convertClockToString . sort . concat $ times
 
-getOldestMissing :: IO ()
-getOldestMissing = do
+getOldestMissingStr :: IO String
+getOldestMissingStr = do
   actualDays <- getLastNGitCommitDays 40
   expectedDays <- generateLastNDays 40
   let actual = Set.fromList actualDays
 
-  if expectedDays == actualDays then putStrLn ""
+  if expectedDays == actualDays then return ""
   else do
     time <- getTime
-    putStrLn $ makeDateString time $ firstMissing expectedDays actual
+    return $ makeDateString time $ firstMissing expectedDays actual
+
+getOldestMissing :: IO ()
+getOldestMissing = do
+  x <- getOldestMissingStr
+  putStrLn x
 
 getDayString :: String -> Set.Set String -> String
 getDayString expected actuals =
@@ -82,17 +87,21 @@ updateGitBashGui = do
   gui <- getBashGui
   writeFile "/home/jack/programming/haskell-course/guifile" gui
 
-printSingleGitCurrent :: (String, [String]) -> String
-printSingleGitCurrent (_ , []) = ""
-printSingleGitCurrent (path, shas) =
+printSingleGitCurrent :: String -> (String, [String]) -> String
+printSingleGitCurrent _ (_ , []) = ""
+printSingleGitCurrent dateStr (path, shas) =
   let oldest = head . lastN 1 $ shas
       total = show . length $ shas
-  in total ++ ": " ++ path ++ "  " ++ oldest
+  in total ++ ": cd " ++ path ++ " && cd .. && "
+     ++ " git checkout master && git merge " ++ oldest
+     ++ " && git commit --amend " ++ dateStr
+     ++ " && git checkout current && git rebase master"
 
 printGitDirsWithCurrents :: IO ()
 printGitDirsWithCurrents = do
+  dateStr <- getOldestMissingStr
   output <- getGits
-  let x = concatMap printSingleGitCurrent output
+  let x = concatMap (printSingleGitCurrent dateStr) output
   print x
 
 main :: IO ()
@@ -105,7 +114,7 @@ parse ["-c"] = getOldestMissing
 parse ["-b"] = printBashGui
 parse ["-u"] = updateGitHooks
 parse ["-w"] = updateGitBashGui
-parse ["-r"] = printGitDirsWithCurrents >> getOldestMissing
+parse ["-r"] = printGitDirsWithCurrents
 parse [] = usage >> exit
 
 usage :: IO ()

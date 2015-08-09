@@ -22,7 +22,9 @@ getGitDirectories = do
   onlyGits <- find (depth <=? 3) (filterFor ignores) path
   return $ onlyGits ++ ["/home/jack/.emacs.bak/.git", "/home/jack/private/.git"]
 
+listGitDirsWithCurrentChanges :: String -> IO (Maybe (String, [String]))
 listGitDirsWithCurrentChanges repoPath = do
+  -- Executes `git rev-list current ^master --no-merges`
   (code,stdout,_) <- readProcessWithExitCode "git" ["--git-dir", repoPath, "rev-list", "current", "^master", "--no-merges"] "."
   return $ if code == ExitSuccess then Just (repoPath,words stdout) else Nothing
 
@@ -32,4 +34,3 @@ getGits = do
   dires <- mapM listGitDirsWithCurrentChanges gits
   return $ catMaybes dires
 
--- "git rev-parse --verify current && git lg current ^master --no-merges"

@@ -22,4 +22,4 @@ generateLastNDays n = liftM reverse $ mapM stringNDaysAgo [0..(n-1)]
 
 makeDateString :: String -> String -> String
 makeDateString t d =
-  "    --date=\"" ++ d ++ " " ++ t ++ "\""
+  " --date=\"" ++ d ++ " " ++ t ++ "\""
