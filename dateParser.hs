@@ -102,7 +102,7 @@ printGitDirsWithCurrents = do
   dateStr <- getOldestMissingStr
   output <- getGits
   let x = concatMap (printSingleGitCurrent dateStr) output
-  print x
+  putStrLn x
 
 main :: IO ()
 main = getArgs >>= parse
