@@ -18,6 +18,17 @@ dailyCounts :: Integer -> UTCTime -> [(Integer, Int)]
 dailyCounts goal today =
  fmap (buildDate goal today) [1..30]
 
+fizzer number =
+  if rem number 3 == 0 && rem number 5 == 0
+  then "fizzbuzz"
+  else if rem number 3 == 0
+       then "fizz"
+       else if rem number 5 == 0
+            then "buzz"
+            else show number
+
+fizzbuzz = map fizzer [1..100]
+
 main :: IO ()
 main = do
   today <- getCurrentTime
