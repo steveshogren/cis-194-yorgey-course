@@ -19,13 +19,12 @@ dailyCounts goal today =
  fmap (buildDate goal today) [1..30]
 
 fizzer number =
-  if rem number 3 == 0 && rem number 5 == 0
-  then "fizzbuzz"
-  else if rem number 3 == 0
-       then "fizz"
-       else if rem number 5 == 0
-            then "buzz"
-            else show number
+  if rem number 3 /= 0 && rem number 5 /= 0
+  then show number
+  else
+    let f = if rem number 3 == 0 then "fizz" else ""
+        b = if rem number 5 == 0 then "buzz" else ""
+        in f ++ b
 
 fizzbuzz = map fizzer [1..100]
 
