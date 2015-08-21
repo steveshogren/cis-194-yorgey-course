@@ -33,3 +33,23 @@ main :: IO ()
 main = do
   today <- getCurrentTime
   print $ dailyCounts 333 today
+
+add :: Num a => a -> a -> a
+add x y = x + y
+
+divide :: Fractional a => a -> a -> a
+divide x y = x / y
+
+concat2 :: [a] -> [a] -> [a]
+concat2 str1 str2 = str1 ++ str2
+-- SPC m s b  -  compiles file
+
+(|>) a b = b a
+
+helloWorld2 :: [a] -> [a] -> [a] -> [a]
+helloWorld2 x y z =
+  z ++ x ++ y
+
+helloWorld x =
+  let name = "hello: " ++ x
+  in name |> print
