@@ -13,8 +13,11 @@ makeDigitTable [[], [], []] = []
 makeDigitTable [a, b, c] =
   [[head a, head b, head c]] ++ makeDigitTable [tail a, tail b, tail c]
 
+matchWith :: Num a => [[Char]] -> a
+matchWith [" _ ",
+           "| |",
+           "|_|"] = 0
+
 doer = do
   x <- getFile "input.dt"
-  return $ makeDigitTable $ breakIntoThrees x
-
-
+  return $ map matchWith $ makeDigitTable $ breakIntoThrees x
