@@ -17,6 +17,15 @@ matchWith :: Num a => [[Char]] -> a
 matchWith [" _ ",
            "| |",
            "|_|"] = 0
+matchWith ["   ",
+           "  |",
+           "  |"] = 1
+matchWith [" _ ",
+           " _|",
+           "|_ "] = 2
+matchWith [" _ ",
+           " _|",
+           " _|"] = 3
 
 doer = do
   x <- getFile "input.dt"
