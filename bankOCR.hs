@@ -26,6 +26,24 @@ matchWith [" _ ",
 matchWith [" _ ",
            " _|",
            " _|"] = 3
+matchWith ["   ",
+           "|_|",
+           "  |"] = 4
+matchWith [" _ ",
+           "|_ ",
+           " _|"] = 5
+matchWith [" _ ",
+           "|_ ",
+           "|_|"] = 6
+matchWith [" _ ",
+           "  |",
+           "  |"] = 7
+matchWith [" _ ",
+           "|_|",
+           "|_|"] = 8
+matchWith [" _ ",
+           "|_|",
+           "  |"] = 9
 
 doer = do
   x <- getFile "input.dt"
