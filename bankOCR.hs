@@ -45,6 +45,14 @@ matchWith [" _ ",
            "|_|",
            "  |"] = 9
 
+fib 0 = 0
+fib 1 = 1
+fib n = fib (n-1) + fib(n-2)
+
+fib2 =
+  let fibi a b n = if (n > 0) then fibi b (a+b) (n-1) else a
+  in fibi 0 1
+
 doer = do
   x <- getFile "input.dt"
   return $ map matchWith $ makeDigitTable $ breakIntoThrees x
