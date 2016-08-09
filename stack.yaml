@@ -1,0 +1,5 @@
+flags: {}
+packages:
+- dateParser/
+extra-deps: []
+resolver: lts-3.6
