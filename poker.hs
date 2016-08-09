@@ -1,23 +1,6 @@
-import Data.Time
-import Data.Time.Format
 import Control.Monad
 import Control.Applicative
 
-day :: (t, t1, t2) -> t2
-day (_, _, d) = d
-
-addToDay :: UTCTime -> Integer -> Day
-addToDay today days =
-  addDays days . utctDay $ today
-
-printDay d = formatTime defaultTimeLocale "   %a - %b %e %Y" d
-
-buildDate goal today daysFuture =
-  let dayNumber = addToDay today daysFuture
-  in (show ((goal * daysFuture) + 2012)) ++ printDay dayNumber
-
-dailyCounts goal today =
- fmap (buildDate goal today) [1..35]
 
 -- patrick mentioned clojure juxt does the same signiture as haskell fmap ($ a)
 -- which is like [a -> b] -> a -> [b]
@@ -35,11 +18,6 @@ fizzer number =
 
 fizzbuzz :: [String]
 fizzbuzz = map fizzer [1..100]
-
-main :: IO [()]
-main = do
-  today <- getCurrentTime
-  sequence $ map (putStrLn . show) $ dailyCounts 333 today
 
 add :: Num a => a -> a -> a
 add x y = x + y
